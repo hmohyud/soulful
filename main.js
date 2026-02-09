@@ -440,7 +440,7 @@
       const node = document.createElement('div');
       node.className = 'pw-node pw-c' + s.clr + (i === 0 ? ' active' : '');
       node.innerHTML = ICONS[i] + '<div class="pw-pulse"></div><span class="pw-node-label">' + s.short + '</span>';
-      node.addEventListener('click', () => goTo(i));
+      node.addEventListener('click', () => { if (!dragJustEnded) goTo(i); });
       wheelEl.appendChild(node);
       nodeEls.push(node);
     });
@@ -526,6 +526,8 @@
     }
 
     function goTo(idx) {
+      // Cancel any momentum spin in progress
+      if (spinAnimId) { cancelAnimationFrame(spinAnimId); spinAnimId = null; velocity = 0; }
       const prevIdx = currentIdx;
       currentIdx = idx;
 
@@ -618,6 +620,18 @@
       gripNotch.style.borderTopColor = '';
     }
 
+    // ── Momentum / physics ──
+    let velocity = 0;           // rad/s
+    let spinAnimId = null;
+    let dragJustEnded = false;  // suppress node clicks right after drag
+    const DECAY = 3.5;          // exponential friction — higher = stops sooner
+    const SELECT_VEL = 5.0;     // below this, start updating selected node
+    const MAGNET_VEL = 0.6;     // below this, pull toward nearest node
+    const MIN_VEL = 0.15;       // fully stop and snap
+    // Track recent pointer positions as { angle (cumulative), time }
+    const trail = [];
+    const TRAIL_WINDOW = 80;    // ms — look back this far for velocity
+
     pointer.addEventListener('mousedown', startDrag);
     pointer.addEventListener('touchstart', startDrag, { passive: false });
 
@@ -625,9 +639,13 @@
       e.preventDefault();
       e.stopPropagation();
       dragging = true;
-      dragStartAngle = getAngleFromEvent(e);
       pointer.classList.add('dragging');
       if (pointerAnimId) { cancelAnimationFrame(pointerAnimId); pointerAnimId = null; }
+      if (spinAnimId) { cancelAnimationFrame(spinAnimId); spinAnimId = null; }
+      velocity = 0;
+      trail.length = 0;
+      const rawStart = getAngleFromEvent(e);
+      trail.push({ a: pointerAngle, t: performance.now(), raw: rawStart });
       colorGrip(currentIdx);
     }
 
@@ -637,11 +655,22 @@
     function onDrag(e) {
       if (!dragging) return;
       if (e.cancelable) e.preventDefault();
-      const angle = getAngleFromEvent(e);
-      pointerAngle = angle;
-      positionPointer(angle);
-      // Live-select whichever node the handle is closest to
-      selectNode(closestNode(angle));
+      const now = performance.now();
+      const rawAngle = getAngleFromEvent(e);
+
+      // Compute delta from last raw angle, unwrap
+      const lastRaw = trail.length > 0 ? trail[trail.length - 1].raw : rawAngle;
+      let dA = rawAngle - lastRaw;
+      while (dA > Math.PI) dA -= 2 * Math.PI;
+      while (dA < -Math.PI) dA += 2 * Math.PI;
+
+      pointerAngle += dA;
+      positionPointer(pointerAngle);
+      selectNode(closestNode(pointerAngle));
+
+      trail.push({ a: pointerAngle, t: now, raw: rawAngle });
+      // Keep only recent entries
+      while (trail.length > 1 && now - trail[0].t > 150) trail.shift();
     }
 
     addEventListener('mouseup', endDrag);
@@ -650,19 +679,84 @@
     function endDrag() {
       if (!dragging) return;
       dragging = false;
+      dragJustEnded = true;
+      setTimeout(() => { dragJustEnded = false; }, 50);
       pointer.classList.remove('dragging');
-
-      // Clear inline color overrides — reverts to default terra via CSS
       clearGripColor();
 
-      // Snap pointer to the already-selected node
-      const snapAngle = nodeAngle(currentIdx);
+      // Compute release velocity from the trail
+      // Try multiple time windows and pick the fastest — this catches
+      // both quick flicks (short window) and sweeping throws (longer window)
+      const now = performance.now();
+      const latest = trail[trail.length - 1];
+      let bestVel = 0;
+      const windows = [30, 50, 80, 120];
+      for (const win of windows) {
+        let sample = trail[0];
+        for (let i = trail.length - 1; i >= 0; i--) {
+          if (now - trail[i].t >= win) { sample = trail[i]; break; }
+        }
+        const dt = (latest.t - sample.t) / 1000;
+        if (dt > 0.003) {
+          const v = (latest.a - sample.a) / dt;
+          if (Math.abs(v) > Math.abs(bestVel)) bestVel = v;
+        }
+      }
+      // Only treat as a throw if the release speed exceeds a hard minimum
+      const THROW_MIN = 12.0; // rad/s — need a hard flick to trigger momentum
+      velocity = Math.abs(bestVel) > THROW_MIN ? bestVel * 2.5 : 0;
 
-      // Find shortest rotation to snap
+      // If barely moving, just snap
+      if (Math.abs(velocity) < MIN_VEL) {
+        snapToNearest();
+        return;
+      }
+
+      // Momentum spin
+      let lastTime = performance.now();
+      function spinTick(now) {
+        const dt = (now - lastTime) / 1000;
+        lastTime = now;
+        if (dt <= 0 || dt > 0.1) { spinAnimId = requestAnimationFrame(spinTick); return; }
+
+        velocity *= Math.exp(-DECAY * dt);
+
+        // Magnetism: when slow enough, pull toward nearest node
+        if (Math.abs(velocity) < MAGNET_VEL) {
+          const nearest = closestNode(pointerAngle);
+          const target = nodeAngle(nearest);
+          let diff = target - pointerAngle;
+          while (diff > Math.PI) diff -= 2 * Math.PI;
+          while (diff < -Math.PI) diff += 2 * Math.PI;
+          // Add a pull force toward the node
+          velocity += diff * 8 * dt;
+        }
+
+        pointerAngle += velocity * dt;
+        positionPointer(pointerAngle);
+
+        // Update selected node once slow enough
+        if (Math.abs(velocity) < SELECT_VEL) {
+          selectNode(closestNode(pointerAngle));
+        }
+
+        if (Math.abs(velocity) > MIN_VEL) {
+          spinAnimId = requestAnimationFrame(spinTick);
+        } else {
+          spinAnimId = null;
+          snapToNearest();
+        }
+      }
+      spinAnimId = requestAnimationFrame(spinTick);
+    }
+
+    function snapToNearest() {
+      const snapIdx = closestNode(pointerAngle);
+      selectNode(snapIdx);
+      const snapAngle = nodeAngle(snapIdx);
       let d = snapAngle - pointerAngle;
       while (d > Math.PI) d -= 2 * Math.PI;
       while (d < -Math.PI) d += 2 * Math.PI;
-
       animatePointer(pointerAngle, pointerAngle + d);
     }
 
