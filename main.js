@@ -417,6 +417,16 @@
     const hubTitle = wrap.querySelector('.pw-hub-title');
     const hubStep = wrap.querySelector('.pw-hub-step');
     const GRIP_W = 48, GRIP_H = 26; // pill dimensions
+    const gripBody = document.querySelector('.pw-grip-body');
+    const gripNotch = document.querySelector('.pw-grip-notch');
+    // Node colors: plum, terra, rose, sage, gold — matching pw-c1..c5
+    const NODE_COLORS = [
+      ['#9b7a9e','#c3a5c6','rgba(155,122,158,.45)'],
+      ['#c67b5c','#e8a889','rgba(198,123,92,.45)'],
+      ['#d4a0a0','#e8c4c4','rgba(212,160,160,.45)'],
+      ['#a3c4a0','#c5dfc3','rgba(163,196,160,.45)'],
+      ['#c9a96e','#dfc99a','rgba(201,169,110,.45)']
+    ];
 
     // Responsive radius
     function getWheelSize() {
@@ -588,6 +598,24 @@
       hubIcon.innerHTML = ICONS[idx];
       hubTitle.textContent = STEPS[idx].title;
       hubStep.textContent = 'Step 0' + (idx + 1);
+
+      // Color-match the grip to the active node while dragging
+      if (dragging) colorGrip(idx);
+    }
+
+    function colorGrip(idx) {
+      const c = NODE_COLORS[STEPS[idx].clr - 1];
+      gripBody.style.setProperty('--g1', c[0]);
+      gripBody.style.setProperty('--g2', c[1]);
+      gripBody.style.boxShadow = '0 4px 20px ' + c[2];
+      gripNotch.style.borderTopColor = c[0];
+    }
+
+    function clearGripColor() {
+      gripBody.style.removeProperty('--g1');
+      gripBody.style.removeProperty('--g2');
+      gripBody.style.boxShadow = '';
+      gripNotch.style.borderTopColor = '';
     }
 
     pointer.addEventListener('mousedown', startDrag);
@@ -600,6 +628,7 @@
       dragStartAngle = getAngleFromEvent(e);
       pointer.classList.add('dragging');
       if (pointerAnimId) { cancelAnimationFrame(pointerAnimId); pointerAnimId = null; }
+      colorGrip(currentIdx);
     }
 
     addEventListener('mousemove', onDrag);
@@ -622,6 +651,9 @@
       if (!dragging) return;
       dragging = false;
       pointer.classList.remove('dragging');
+
+      // Clear inline color overrides — reverts to default terra via CSS
+      clearGripColor();
 
       // Snap pointer to the already-selected node
       const snapAngle = nodeAngle(currentIdx);

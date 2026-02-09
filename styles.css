@@ -508,21 +508,19 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   user-select:none;-webkit-user-select:none;touch-action:none}
 .pw-pointer:active{cursor:grabbing}
 .pw-grip-body{width:48px;height:26px;border-radius:13px;
-  background:linear-gradient(135deg,var(--terra),var(--terra-light));
+  --g1:var(--terra);--g2:var(--terra-light);
+  background:linear-gradient(135deg,var(--g1),var(--g2));
   box-shadow:0 3px 14px rgba(198,123,92,.4);
   display:flex;align-items:center;justify-content:center;gap:3px;
   position:relative;
-  transition:transform .15s var(--ease),box-shadow .15s;
+  transition:transform .15s var(--ease),box-shadow .25s;
   animation:pwGripGlow 2.5s ease-in-out infinite}
 .pw-pointer:hover .pw-grip-body{transform:scale(1.12);box-shadow:0 4px 20px rgba(198,123,92,.55)}
-.pw-pointer.dragging .pw-grip-body{transform:scale(1.08);
-  background:linear-gradient(135deg,var(--plum),var(--plum-light));
-  box-shadow:0 4px 20px rgba(107,76,110,.5)}
+.pw-pointer.dragging .pw-grip-body{transform:scale(1.08);animation:none}
 .pw-grip-line{width:2px;height:12px;border-radius:1px;background:rgba(255,255,255,.55)}
 .pw-grip-notch{position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);
   width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;
-  border-top:5px solid var(--terra);transition:border-top-color .15s}
-.pw-pointer.dragging .pw-grip-notch{border-top-color:var(--plum)}
+  border-top:5px solid var(--terra);transition:border-top-color .25s}
 @keyframes pwGripGlow{
   0%,100%{box-shadow:0 3px 14px rgba(198,123,92,.4),0 0 0 0 rgba(198,123,92,.15)}
   50%{box-shadow:0 3px 14px rgba(198,123,92,.4),0 0 0 7px rgba(198,123,92,.06)}}
