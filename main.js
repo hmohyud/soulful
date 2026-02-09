@@ -20,7 +20,7 @@
     let mx = 0, my = 0, rx = 0, ry = 0;
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = (mx-4)+'px'; dot.style.top = (my-4)+'px'; });
     (function cl() { rx+=(mx-rx)*.1; ry+=(my-ry)*.1; ring.style.left=(rx-22)+'px'; ring.style.top=(ry-22)+'px'; requestAnimationFrame(cl); })();
-    const sel = 'a,button,.faq-q,.gallery-item,.benefit-card,.slider-btn,.workshop-pill,.credential,.btt,.magnetic,.paint-color,.paint-clear,.tmode-btn,.tcard,.copy-btn,.tl-item,.garden-seed';
+    const sel = 'a,button,.faq-q,.gallery-item,.benefit-card,.workshop-pill,.credential,.btt,.magnetic,.paint-color,.paint-clear,.tcard,.copy-btn,.tl-item,.garden-seed';
     document.addEventListener('mouseover', e => { if(e.target.closest(sel)){dot.classList.add('hovering');ring.classList.add('hovering');} });
     document.addEventListener('mouseout', e => { if(e.target.closest(sel)){dot.classList.remove('hovering');ring.classList.remove('hovering');} });
   }
@@ -638,389 +638,101 @@
   })();
 
 
-  /* ═══════════════ TESTIMONIALS — Multi-Mode Card Display ═══════════════ */
+  /* ═══════════════ TESTIMONIALS — Draggable Stack ═══════════════ */
   (() => {
     const slider = document.getElementById('testimonialSlider');
     if (!slider) return;
     const container = slider.querySelector('.tcard-container');
     const cards = Array.from(container.querySelectorAll('.tcard'));
-    const navEl = document.getElementById('tSliderNav');
-    const dotsEl = document.getElementById('sliderDots');
-    const prevBtn = document.getElementById('tPrev');
-    const nextBtn = document.getElementById('tNext');
     const resetBtn = document.getElementById('tStackReset');
-    const modeBtns = document.querySelectorAll('.tmode-btn');
     const total = cards.length;
-    let mode = 'stack', cur = 0;
+    let tossed = [];
 
-    // Build dots
-    for (let i = 0; i < total; i++) {
-      const d = document.createElement('div');
-      d.className = 'slider-dot' + (i === 0 ? ' active' : '');
-      d.addEventListener('click', () => goTo(i));
-      dotsEl.appendChild(d);
-    }
-    const dots = dotsEl.querySelectorAll('.slider-dot');
-    function updateDots() { dots.forEach((d, i) => d.classList.toggle('active', i === cur)); }
-    function goTo(n) { cur = ((n % total) + total) % total; updateDots(); renderMode(); }
-
-    // ── Nav buttons ──
-    prevBtn.addEventListener('click', () => goTo(cur - 1));
-    nextBtn.addEventListener('click', () => goTo(cur + 1));
-
-    // ── Mode switching ──
-    modeBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const newMode = btn.dataset.mode;
-        if (newMode === mode) return;
-        modeBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        switchMode(newMode);
-      });
+    // Measure tallest card and set container height
+    let maxH = 320;
+    cards.forEach(c => {
+      const front = c.querySelector('.tcard-front');
+      if (front && front.offsetHeight > maxH) maxH = front.offsetHeight;
     });
+    container.style.minHeight = maxH + 'px';
 
-    function switchMode(newMode) {
-      // Phase 1: fade out cards
-      cards.forEach(c => { c.style.opacity = '0'; c.style.transition = 'opacity .25s'; });
-      setTimeout(() => {
-        // Phase 2: swap layout while invisible
-        slider.classList.remove('tmode-stack', 'tmode-carousel', 'tmode-grid', 'tmode-flip');
-        slider.classList.add('tmode-' + newMode);
-        mode = newMode;
-        // Reset card states
-        container.style.display = '';
-        container.style.overflow = '';
-        container.style.transform = '';
-        container.style.transition = '';
-        container.style.cursor = '';
-        cards.forEach(c => {
-          c.classList.remove('tossed', 'flipped', 'expanded', 'dimmed');
-          c.style.transform = '';
-          c.style.left = '';
-          c.style.top = '';
-          c.style.zIndex = '';
-          c.style.opacity = '0';
-          c.style.position = '';
-          c.style.flex = '';
-          c.style.minWidth = '';
-          c.style.pointerEvents = '';
-          c.style.display = '';
-          c.style.transition = '';
-        });
-        tossedIndices = [];
-        cur = 0;
-        updateDots();
-        initMode();
-        // Phase 3: capture target opacities set by initMode, then animate to them
-        const targetOpacities = cards.map(c => c.style.opacity || '1');
-        cards.forEach(c => { c.style.opacity = '0'; });
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            cards.forEach((c, i) => {
-              setTimeout(() => {
-                c.style.transition = 'opacity .35s var(--ease)';
-                c.style.opacity = targetOpacities[i];
-                setTimeout(() => { c.style.transition = ''; }, 400);
-              }, 40 * i);
-            });
-          });
-        });
-      }, 280);
-    }
-
-    function initMode() {
-      navEl.style.display = (mode === 'grid') ? 'none' : 'flex';
-      resetBtn.classList.remove('visible');
-      destroyDrag();
-      if (flipTiltCleanup) { flipTiltCleanup(); flipTiltCleanup = null; }
-
-      if (mode === 'stack') initStack();
-      else if (mode === 'carousel') initCarousel();
-      else if (mode === 'grid') initGrid();
-      else if (mode === 'flip') initFlip();
-    }
-
-    // ═══ STACK MODE ═══
-    let tossedIndices = [];
-    let stackDragCleanup = null;
-
-    function initStack() {
-      layoutStack();
-      setupStackDrag();
+    function topCard() {
+      for (let i = 0; i < total; i++) if (!tossed.includes(i)) return { el: cards[i], idx: i };
+      return null;
     }
 
     function layoutStack() {
-      const active = cards.filter((_, i) => !tossedIndices.includes(i));
-      const tossed = cards.filter((_, i) => tossedIndices.includes(i));
-
-      tossed.forEach(c => {
+      const active = cards.filter((_, i) => !tossed.includes(i));
+      cards.filter((_, i) => tossed.includes(i)).forEach(c => {
         c.classList.add('tossed');
         c.style.zIndex = '0';
+        c.style.opacity = '0';
+        c.style.pointerEvents = 'none';
       });
-
       active.forEach((c, i) => {
         c.classList.remove('tossed');
-        // i=0 is the top card (highest z-index, no offset)
-        // i=1 is behind it (lower z, slight offset), etc.
-        const depth = i; // 0 = top, 1 = next behind, ...
-        const offset = depth * 6;
-        const rot = (depth % 2 === 0 ? 1 : -1) * depth * 0.8;
-        c.style.zIndex = String(active.length - depth);
-        c.style.transform = `translateY(${offset}px) rotate(${rot}deg) scale(${1 - depth * 0.02})`;
-        c.style.opacity = depth > 3 ? '0' : String(1 - depth * 0.12);
+        c.style.zIndex = String(active.length - i);
+        c.style.transform = 'translateY(' + (i * 6) + 'px) rotate(' + ((i % 2 === 0 ? 1 : -1) * i * 0.8) + 'deg) scale(' + (1 - i * 0.02) + ')';
+        c.style.opacity = i > 3 ? '0' : String(1 - i * 0.12);
+        c.style.pointerEvents = '';
       });
+      resetBtn.classList.toggle('visible', tossed.length > 0);
+    }
 
-      if (tossedIndices.length > 0 && tossedIndices.length < total) {
-        resetBtn.classList.add('visible');
+    let dragging = false, dragCard = null, startX = 0, dx = 0;
+
+    container.addEventListener('mousedown', onDown);
+    container.addEventListener('touchstart', onDown, { passive: true });
+    window.addEventListener('mousemove', onMove);
+    window.addEventListener('touchmove', onMove, { passive: true });
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('touchend', onUp);
+
+    function onDown(e) {
+      if (e.target.closest('.tstack-reset')) return;
+      const top = topCard();
+      if (!top) return;
+      dragging = true;
+      dragCard = top;
+      const ev = e.touches ? e.touches[0] : e;
+      startX = ev.clientX;
+      dx = 0;
+      container.classList.add('dragging');
+      dragCard.el.style.transition = 'none';
+    }
+    function onMove(e) {
+      if (!dragging || !dragCard) return;
+      const ev = e.touches ? e.touches[0] : e;
+      dx = ev.clientX - startX;
+      dragCard.el.style.transform = 'translate(' + dx + 'px,' + (Math.abs(dx) * -0.15) + 'px) rotate(' + (dx * 0.06) + 'deg)';
+    }
+    function onUp() {
+      if (!dragging || !dragCard) return;
+      dragging = false;
+      container.classList.remove('dragging');
+      dragCard.el.style.transition = '';
+      if (Math.abs(dx) > 100) {
+        const dir = dx > 0 ? 1 : -1;
+        dragCard.el.style.transition = 'transform .5s var(--ease), opacity .4s';
+        dragCard.el.style.transform = 'translate(' + (dir * 900) + 'px,-80px) rotate(' + (dir * 25) + 'deg)';
+        dragCard.el.style.opacity = '0';
+        const idx = dragCard.idx;
+        tossed.push(idx);
+        setTimeout(() => { cards[idx].classList.add('tossed'); layoutStack(); }, 500);
       } else {
-        resetBtn.classList.remove('visible');
+        layoutStack();
       }
-      if (tossedIndices.length >= total) {
-        resetBtn.classList.add('visible');
-      }
-    }
-
-    function setupStackDrag() {
-      let startX = 0, startY = 0, dragging = false, dragCard = null, dx = 0;
-
-      function getTopCard() {
-        for (let i = 0; i < total; i++) {
-          if (!tossedIndices.includes(i)) return { card: cards[i], index: i };
-        }
-        return null;
-      }
-
-      function onDown(e) {
-        const top = getTopCard();
-        if (!top) return;
-        dragging = true;
-        dragCard = top;
-        const ev = e.touches ? e.touches[0] : e;
-        startX = ev.clientX; startY = ev.clientY; dx = 0;
-        container.style.cursor = 'grabbing';
-      }
-      function onMove(e) {
-        if (!dragging || !dragCard) return;
-        const ev = e.touches ? e.touches[0] : e;
-        dx = ev.clientX - startX;
-        const dy = ev.clientY - startY;
-        const rot = dx * 0.08;
-        dragCard.card.style.transform = `translate(${dx}px,${dy * 0.3}px) rotate(${rot}deg)`;
-        dragCard.card.style.transition = 'none';
-      }
-      function onUp() {
-        if (!dragging || !dragCard) return;
-        dragging = false;
-        container.style.cursor = '';
-        dragCard.card.style.transition = '';
-
-        if (Math.abs(dx) > 100) {
-          // Toss the card
-          const dir = dx > 0 ? 1 : -1;
-          dragCard.card.style.transform = `translate(${dir * 800}px, -100px) rotate(${dir * 30}deg)`;
-          dragCard.card.style.opacity = '0';
-          tossedIndices.push(dragCard.index);
-          setTimeout(() => {
-            dragCard.card.classList.add('tossed');
-            layoutStack();
-          }, 500);
-        } else {
-          layoutStack();
-        }
-        dragCard = null;
-      }
-
-      container.addEventListener('mousedown', onDown);
-      container.addEventListener('touchstart', onDown, { passive: true });
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('touchmove', onMove, { passive: true });
-      window.addEventListener('mouseup', onUp);
-      window.addEventListener('touchend', onUp);
-
-      stackDragCleanup = () => {
-        container.removeEventListener('mousedown', onDown);
-        container.removeEventListener('touchstart', onDown);
-        window.removeEventListener('mousemove', onMove);
-        window.removeEventListener('touchmove', onMove);
-        window.removeEventListener('mouseup', onUp);
-        window.removeEventListener('touchend', onUp);
-      };
-    }
-
-    function destroyDrag() {
-      if (stackDragCleanup) { stackDragCleanup(); stackDragCleanup = null; }
+      dragCard = null;
     }
 
     resetBtn.addEventListener('click', () => {
-      tossedIndices = [];
-      cards.forEach(c => { c.classList.remove('tossed'); c.style.opacity = ''; c.style.transform = ''; });
+      tossed = [];
+      cards.forEach(c => { c.style.cssText = ''; c.classList.remove('tossed'); });
+      container.style.minHeight = maxH + 'px';
       layoutStack();
     });
 
-    // ═══ CAROUSEL MODE ═══
-    function initCarousel() {
-      container.style.display = 'flex';
-      container.style.overflow = 'hidden';
-      cards.forEach((c, i) => {
-        c.style.position = 'relative';
-        c.style.flex = '0 0 100%';
-        c.style.minWidth = '100%';
-        c.style.transform = '';
-        c.style.opacity = '1';
-        c.style.zIndex = '';
-      });
-      renderCarousel();
-    }
-
-    function renderCarousel() {
-      container.style.transform = `translateX(-${cur * 100}%)`;
-      container.style.transition = 'transform .7s ' + getComputedStyle(document.documentElement).getPropertyValue('--ease');
-      updateDots();
-    }
-
-    // ═══ GRID MODE ═══
-    let gridExpandedIdx = -1;
-
-    function initGrid() {
-      gridExpandedIdx = -1;
-      container.style.display = '';
-      container.style.overflow = '';
-      container.style.transform = '';
-      container.style.transition = '';
-      cards.forEach((c, i) => {
-        c.style.position = '';
-        c.style.flex = '';
-        c.style.minWidth = '';
-        c.style.opacity = '1';
-        c.style.transform = '';
-        c.style.zIndex = '';
-        c.style.pointerEvents = '';
-        c.classList.remove('expanded', 'dimmed');
-        // Remove then add to avoid duplication
-        c.removeEventListener('click', gridClickHandler);
-        c.addEventListener('click', gridClickHandler);
-      });
-    }
-
-    function gridClickHandler(e) {
-      const card = e.currentTarget;
-      const idx = cards.indexOf(card);
-      if (mode !== 'grid') return;
-
-      if (card.classList.contains('expanded')) {
-        // Collapse
-        cards.forEach(c => c.classList.remove('expanded', 'dimmed'));
-        gridExpandedIdx = -1;
-      } else {
-        // Expand this, dim others
-        cards.forEach(c => { c.classList.remove('expanded'); c.classList.add('dimmed'); });
-        card.classList.remove('dimmed');
-        card.classList.add('expanded');
-        gridExpandedIdx = idx;
-      }
-    }
-
-    // ═══ FLIP MODE ═══
-    let flipTiltCleanup = null;
-
-    function initFlip() {
-      container.style.display = '';
-      container.style.overflow = '';
-      container.style.transform = '';
-      cards.forEach((c, i) => {
-        c.style.position = '';
-        c.style.flex = '';
-        c.style.minWidth = '';
-        // Show only current card
-        if (i === cur) {
-          c.style.position = 'relative';
-          c.style.opacity = '1';
-          c.style.zIndex = '1';
-          c.style.display = '';
-        } else {
-          c.style.position = 'absolute';
-          c.style.opacity = '0';
-          c.style.zIndex = '0';
-          c.style.pointerEvents = 'none';
-        }
-      });
-      setupFlipTilt();
-    }
-
-    function setupFlipTilt() {
-      function onMove(e) {
-        if (mode !== 'flip') return;
-        const card = cards[cur];
-        if (!card || card.classList.contains('flipped')) return;
-        const rect = card.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / rect.width - 0.5;
-        const y = (e.clientY - rect.top) / rect.height - 0.5;
-        card.style.transform = `perspective(1200px) rotateY(${x * 12}deg) rotateX(${-y * 8}deg)`;
-      }
-      function onLeave() {
-        if (mode !== 'flip') return;
-        const card = cards[cur];
-        if (card && !card.classList.contains('flipped')) {
-          card.style.transform = '';
-        }
-      }
-      function onClick(e) {
-        if (mode !== 'flip') return;
-        const card = cards[cur];
-        if (!card) return;
-        // Don't flip if clicking nav buttons
-        if (e.target.closest('.slider-nav')) return;
-        card.classList.toggle('flipped');
-        if (card.classList.contains('flipped')) {
-          card.style.transform = 'rotateY(180deg)';
-        } else {
-          card.style.transform = '';
-        }
-      }
-
-      container.addEventListener('mousemove', onMove);
-      container.addEventListener('mouseleave', onLeave);
-      container.addEventListener('click', onClick);
-
-      flipTiltCleanup = () => {
-        container.removeEventListener('mousemove', onMove);
-        container.removeEventListener('mouseleave', onLeave);
-        container.removeEventListener('click', onClick);
-      };
-    }
-
-    // ── renderMode: called when cur changes ──
-    function renderMode() {
-      if (mode === 'carousel') renderCarousel();
-      else if (mode === 'flip') {
-        cards.forEach((c, i) => {
-          c.classList.remove('flipped');
-          if (i === cur) {
-            c.style.position = 'relative';
-            c.style.opacity = '1';
-            c.style.zIndex = '1';
-            c.style.transform = '';
-            c.style.pointerEvents = '';
-            c.style.display = '';
-          } else {
-            c.style.position = 'absolute';
-            c.style.opacity = '0';
-            c.style.zIndex = '0';
-            c.style.pointerEvents = 'none';
-          }
-        });
-      }
-    }
-
-    // Keyboard nav
-    slider.setAttribute('tabindex', '0');
-    slider.addEventListener('keydown', e => {
-      if (e.key === 'ArrowLeft') goTo(cur - 1);
-      if (e.key === 'ArrowRight') goTo(cur + 1);
-    });
-
-    // Init default mode
-    initMode();
+    layoutStack();
   })();
 
 

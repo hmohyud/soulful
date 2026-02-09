@@ -190,6 +190,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .hero-vanta{position:absolute;inset:0;z-index:0}
 
 .hero-content{position:relative;z-index:1;text-align:center;max-width:880px}
+.hero-portrait{margin-bottom:1.8rem;animation:heroFade 1s .1s both}
+.hero-portrait img{width:110px;height:110px;border-radius:50%;object-fit:cover;
+  border:3px solid rgba(255,255,255,.8);box-shadow:0 8px 32px rgba(0,0,0,.12)}
 .hero-badge{display:inline-flex;align-items:center;gap:.6rem;
   background:rgba(107,143,113,.1);color:var(--sage);padding:.4rem 1.3rem;
   border-radius:100px;font-size:.72rem;font-weight:600;letter-spacing:.1em;
@@ -370,30 +373,16 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .testimonials-inner{max-width:1200px;margin:0 auto}
 .testimonials-header{text-align:center;margin-bottom:var(--s7)}
 
-/* ── Mode switcher bar ── */
-.tmode-switcher{display:flex;justify-content:center;gap:.4rem;margin-bottom:2rem;
-  background:var(--warm-white);border:1px solid var(--border);border-radius:100px;
-  padding:.35rem;width:fit-content;margin-left:auto;margin-right:auto}
-.tmode-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;transition:all .4s var(--ease);background:transparent;
-  border:1.5px solid transparent;cursor:pointer}
-.tmode-btn svg{width:18px;height:18px;color:var(--gray-light);transition:color .3s}
-.tmode-btn:hover{background:var(--sage-faint)}
-.tmode-btn:hover svg{color:var(--sage)}
-.tmode-btn.active{background:var(--terra);border-color:var(--terra)}
-.tmode-btn.active svg{color:white}
-
 /* ── Card container + common card styles ── */
-.tcard-container{position:relative;max-width:820px;margin:0 auto}
-.tcard{border-radius:2rem;transition:all .5s var(--ease);cursor:default}
+.tcard-container{position:relative;max-width:820px;margin:0 auto;cursor:grab;min-height:320px}
+.tcard-container:active{cursor:grabbing}
+.tcard-container.dragging{user-select:none;-webkit-user-select:none}
+.tcard{position:absolute;width:100%;top:0;left:0;border-radius:2rem;
+  box-shadow:0 4px 20px rgba(0,0,0,.08);
+  transition:transform .6s var(--ease),opacity .6s var(--ease);cursor:default}
+.tcard.tossed{pointer-events:none}
 .tcard-front{background:var(--warm-white);border:1px solid var(--border);
   padding:clamp(2rem,4vw,3.5rem);position:relative;border-radius:2rem}
-.tcard-back{position:absolute;inset:0;border-radius:2rem;
-  transform:rotateY(180deg);display:none;align-items:center;justify-content:center;
-  backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
-.tcard-back-word{font-family:var(--f-display);font-size:clamp(2.5rem,5vw,4rem);
-  font-weight:300;font-style:italic;color:rgba(255,255,255,.9);text-shadow:0 2px 20px rgba(0,0,0,.15);
-  z-index:1;position:relative}
 
 .slide-quote{position:absolute;top:1.5rem;left:2rem;font-family:var(--f-display);
   font-size:5rem;color:var(--sage-light);opacity:.2;line-height:1;user-select:none}
@@ -407,87 +396,15 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .slide-meta .slide-name{font-weight:600;color:var(--deep);font-size:.9rem}
 .slide-meta .slide-role{color:var(--gray);font-size:.8rem}
 
-/* Nav & dots */
-.slider-nav{display:flex;align-items:center;justify-content:center;gap:1.5rem;margin-top:2rem}
-.slider-btn{width:48px;height:48px;border-radius:50%;border:1.5px solid var(--deep);
-  display:flex;align-items:center;justify-content:center;transition:all .4s var(--ease)}
-.slider-btn svg{width:18px;height:18px;color:var(--deep);transition:color .3s}
-.slider-btn:hover{background:var(--deep)}
-.slider-btn:hover svg{color:var(--cream)}
-.slider-dots{display:flex;gap:.4rem}
-.slider-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-light);
-  transition:all .4s var(--ease);cursor:pointer;opacity:.4}
-.slider-dot.active{opacity:1;background:var(--terra);width:24px;border-radius:4px}
-
 /* Stack reset button */
 .tstack-reset{display:none;align-items:center;gap:.5rem;margin:1.5rem auto 0;
   padding:.5rem 1.2rem;border-radius:100px;font-size:.7rem;color:var(--gray);
   border:1px solid var(--border);background:var(--warm-white);cursor:pointer;
   transition:all .3s var(--ease);letter-spacing:.04em;text-transform:uppercase;font-weight:500}
 .tstack-reset:hover{border-color:var(--sage);color:var(--sage);background:var(--sage-faint)}
+.tstack-reset.visible{display:flex}
 
-/* ── MODE: STACK ── */
-.tmode-stack .tcard-container{cursor:grab;min-height:320px}
-.tmode-stack .tcard-container:active{cursor:grabbing}
-.tmode-stack .tcard-container.dragging{user-select:none;-webkit-user-select:none}
-.tmode-stack .tcard{position:absolute;width:100%;top:0;left:0;
-  box-shadow:0 4px 20px rgba(0,0,0,.08);transition:transform .6s var(--ease),opacity .6s var(--ease)}
-.tmode-stack .tcard.tossed{pointer-events:none}
-.tmode-stack .tstack-reset.visible{display:flex}
-.tmode-stack .slider-nav{display:none}
-
-/* ── MODE: CAROUSEL ── */
-.tmode-carousel .tcard-container{overflow:hidden}
-.tmode-carousel .tcard-track{display:flex;transition:transform .7s var(--ease)}
-.tmode-carousel .tcard{flex:0 0 100%;min-width:100%}
-.tmode-carousel .tcard-back{display:none}
-
-/* ── MODE: GRID ── */
-.tmode-grid .tcard-container{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;
-  max-width:100%}
-.tmode-grid .tcard{cursor:pointer;transition:all .5s var(--ease)}
-.tmode-grid .tcard-front{padding:1.5rem}
-.tmode-grid .tcard-back{display:none}
-.tmode-grid .slide-quote{font-size:3rem;top:1rem;left:1.2rem}
-.tmode-grid .slide-text{font-size:.82rem;line-height:1.7;margin-bottom:1rem;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.tmode-grid .slide-avatar{width:36px;height:36px}
-.tmode-grid .slide-avatar svg{width:18px;height:18px}
-.tmode-grid .slide-name{font-size:.8rem}
-.tmode-grid .slide-role{font-size:.7rem}
-.tmode-grid .tcard:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.08)}
-.tmode-grid .tcard.expanded{grid-column:1/-1;z-index:10}
-.tmode-grid .tcard.expanded .slide-text{-webkit-line-clamp:unset;overflow:visible}
-.tmode-grid .tcard.expanded .tcard-front{padding:clamp(2rem,4vw,3.5rem)}
-.tmode-grid .tcard.expanded .slide-quote{font-size:5rem;top:1.5rem;left:2rem}
-.tmode-grid .tcard.expanded .slide-text{font-size:.98rem;line-height:1.9}
-.tmode-grid .tcard.dimmed{opacity:.4;transform:scale(.97);pointer-events:none}
-.tmode-grid .slider-nav{display:none}
-.tmode-grid .tstack-reset{display:none!important}
-
-/* ── MODE: FLIP ── */
-.tmode-flip .tcard-container{perspective:1200px;max-width:820px}
-.tmode-flip .tcard{position:absolute;width:100%;top:0;left:0;
-  transform-style:preserve-3d;cursor:pointer;transition:transform .8s var(--ease),opacity .4s}
-.tmode-flip .tcard-front{backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.tmode-flip .tcard.flipped{transform:rotateY(180deg)}
-.tmode-flip .tcard-back{display:flex}
-.tmode-flip .tcard.hidden-card{opacity:0;pointer-events:none}
-
-/* Generative gradient backs for flip mode */
-.tcard[data-index="0"] .tcard-back{background:linear-gradient(135deg,#a3c4a0,#c9a96e,#a3c4a0)}
-.tcard[data-index="1"] .tcard-back{background:linear-gradient(135deg,#c67b5c,#d4a0a0,#c67b5c)}
-.tcard[data-index="2"] .tcard-back{background:linear-gradient(135deg,#9b7a9e,#d4a0a0,#c9a96e)}
-.tcard[data-index="3"] .tcard-back{background:linear-gradient(135deg,#c67b5c,#c9a96e,#a3c4a0)}
-.tcard[data-index="4"] .tcard-back{background:linear-gradient(135deg,#a3c4a0,#9b7a9e,#c67b5c)}
-.tcard[data-index="5"] .tcard-back{background:linear-gradient(135deg,#d4a0a0,#9b7a9e,#a3c4a0)}
-
-@media(max-width:768px){
-  .tmode-grid .tcard-container{grid-template-columns:repeat(2,1fr)}
-  .tmode-switcher{margin-bottom:1.5rem}
-}
 @media(max-width:480px){
-  .tmode-grid .tcard-container{grid-template-columns:1fr}
   .tcard-front{padding:1.5rem}
 }
 
