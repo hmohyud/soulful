@@ -108,7 +108,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .nav-therapist{display:flex;align-items:center;gap:.65rem;padding:.35rem .8rem .35rem .35rem;
   border-radius:100px;border:1px solid var(--border);transition:all .4s var(--ease);
   background:rgba(255,255,255,.5);backdrop-filter:blur(8px);margin-left:.5rem;
-  cursor:pointer;font:inherit}
+  cursor:pointer;font:inherit;opacity:0;pointer-events:none}
+.nav-therapist.visible{opacity:1;pointer-events:auto}
 .nav-therapist:hover{border-color:var(--sage-light);background:rgba(255,255,255,.8);
   transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.05)}
 .nav-therapist img{width:34px;height:34px;border-radius:50%;object-fit:cover;
@@ -257,6 +258,20 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   letter-spacing:.08em;text-transform:uppercase;pointer-events:none;transition:opacity .6s}
 .garden-hint.hidden{opacity:0}
 
+@media(max-width:768px){
+  .garden{height:340px}
+  .garden-word{font-size:1.3rem}
+  .garden-desc{font-size:.75rem}
+  .garden-hint{font-size:.6rem}
+}
+@media(max-width:480px){
+  .garden{height:280px}
+  .garden-word{font-size:1.1rem}
+  .garden-desc{font-size:.7rem}
+  .garden-text{top:1rem;padding:0 .8rem}
+  .garden-hint{font-size:.55rem;bottom:.7rem}
+}
+
 /* ════════════════ BENEFITS ════════════════ */
 .benefits{padding:var(--s9) 2rem;position:relative}
 .benefits-inner{max-width:1200px;margin:0 auto}
@@ -342,6 +357,26 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   border:2px solid var(--rose);animation:healRipple 1s ease-out forwards;pointer-events:none}
 @keyframes healRipple{0%{width:10px;height:10px;opacity:.6}100%{width:60px;height:60px;opacity:0}}
 
+@media(max-width:768px){
+  .benefits{padding:4rem 1.5rem}
+  .benefits-header{margin-bottom:2rem}
+  .benefit-card{padding:1.6rem 1rem;border-radius:1.2rem}
+  .benefit-icon{width:48px;height:48px;margin-bottom:1rem}
+  .benefit-icon svg{width:22px;height:22px}
+  .benefit-card h3{font-size:1.1rem}
+  .benefit-card p{font-size:.8rem;line-height:1.65}
+  .benefit-interact>span{font-size:.5rem}
+}
+@media(max-width:480px){
+  .benefits{padding:3rem 1rem}
+  .benefits-header{margin-bottom:1.5rem}
+  .benefit-card{padding:1.4rem .9rem;border-radius:1rem}
+  .benefit-icon{width:42px;height:42px;margin-bottom:.8rem}
+  .benefit-icon svg{width:20px;height:20px}
+  .benefit-card h3{font-size:1rem;margin-bottom:.4rem}
+  .benefit-card p{font-size:.78rem;line-height:1.6}
+}
+
 /* ════════════════ POWER OF ART ════════════════ */
 .power{padding:var(--s9) 2rem;background:var(--deep);position:relative;overflow:hidden}
 .power-inner{max-width:1080px;margin:0 auto;display:flex;gap:4rem;align-items:stretch}
@@ -370,6 +405,24 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);
   cursor:pointer;transition:all .3s;background:transparent;margin-left:.3rem}
 .paint-clear:hover{background:rgba(255,255,255,.1);color:white}
+
+@media(max-width:768px){
+  .power{padding:4rem 1.5rem}
+  .power-text p{font-size:.9rem;line-height:1.75}
+  .power-canvas-wrap{min-height:280px;border-radius:1.2rem}
+  .paint-palette{padding:.4rem .6rem;gap:.35rem}
+  .paint-color{width:24px;height:24px}
+  .paint-clear{width:24px;height:24px}
+}
+@media(max-width:480px){
+  .power{padding:3rem 1rem}
+  .power-text p{font-size:.85rem;line-height:1.7;margin-top:1rem}
+  .power-canvas-wrap{min-height:240px;border-radius:1rem}
+  .power-canvas-hint{font-size:.6rem}
+  .paint-palette{padding:.35rem .5rem;gap:.3rem}
+  .paint-color{width:22px;height:22px}
+  .paint-clear{width:22px;height:22px}
+}
 
 /* ════════════════ TESTIMONIALS ════════════════ */
 .testimonials{padding:var(--s9) 2rem;position:relative;overflow:hidden;
@@ -408,8 +461,33 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .tstack-reset:hover{border-color:var(--sage);color:var(--sage);background:var(--sage-faint)}
 .tstack-reset.visible{display:flex}
 
+@media(max-width:768px){
+  .testimonials{padding:4rem 1.5rem}
+  .testimonials-header{margin-bottom:2rem}
+  .tcard-container{min-height:280px}
+  .tcard{border-radius:1.4rem}
+  .tcard-front{padding:2rem 1.8rem;border-radius:1.4rem}
+  .slide-quote{font-size:3.5rem;top:1rem;left:1.5rem}
+  .slide-text{font-size:.92rem;line-height:1.75;margin-bottom:1.5rem}
+  .slide-avatar{width:40px;height:40px}
+  .slide-avatar svg{width:18px;height:18px}
+  .slide-meta .slide-name{font-size:.85rem}
+  .slide-meta .slide-role{font-size:.75rem}
+  .tstack-reset{margin-top:1rem}
+}
 @media(max-width:480px){
-  .tcard-front{padding:1.5rem}
+  .testimonials{padding:3rem 1rem}
+  .testimonials-header{margin-bottom:1.5rem}
+  .tcard-container{min-height:240px}
+  .tcard{border-radius:1.2rem}
+  .tcard-front{padding:1.5rem 1.3rem;border-radius:1.2rem}
+  .slide-quote{font-size:2.8rem;top:.8rem;left:1.2rem}
+  .slide-text{font-size:.88rem;line-height:1.7;margin-bottom:1.2rem;padding-top:.6rem}
+  .slide-footer{gap:.75rem}
+  .slide-avatar{width:36px;height:36px}
+  .slide-avatar svg{width:16px;height:16px}
+  .slide-meta .slide-name{font-size:.82rem}
+  .slide-meta .slide-role{font-size:.72rem}
 }
 
 /* ════════════════ HOW SESSIONS WORK ════════════════ */
@@ -480,11 +558,40 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .ssd-item svg{flex-shrink:0;color:var(--sage)}
 
 @media(max-width:768px){
+  .sessions{padding:4rem 1.5rem}
+  .sessions-desc{font-size:.9rem;line-height:1.7}
+  .sessions-hint{margin-bottom:2rem}
   .session-step-content{padding:0 1.2rem 1.2rem 1.2rem}
+  .session-step-content p{font-size:.86rem;line-height:1.75;margin-bottom:.8rem}
   .session-step-header{gap:.8rem;padding:1rem 1.2rem}
+  .session-step-num{font-size:1.3rem;min-width:22px}
   .session-step-icon{width:36px;height:36px}
   .session-step-icon svg{width:16px;height:16px}
+  .session-step-title h3{font-size:1.05rem}
+  .session-step-toggle{width:28px;height:28px}
+  .session-step-toggle svg{width:12px;height:12px}
+  .session-step.active .session-step-body{max-height:400px}
   .session-step-details{flex-direction:column;gap:.4rem}
+  .ssd-item{font-size:.68rem;padding:.3rem .7rem}
+}
+@media(max-width:480px){
+  .sessions{padding:3rem 1rem}
+  .sessions-desc{font-size:.85rem;line-height:1.65}
+  .sessions-hint{margin-bottom:1.5rem;font-size:.6rem}
+  .session-steps{gap:.6rem}
+  .session-step{border-radius:1rem}
+  .session-step-header{gap:.6rem;padding:.85rem 1rem}
+  .session-step-num{font-size:1.1rem;min-width:20px}
+  .session-step-icon{width:32px;height:32px}
+  .session-step-icon svg{width:14px;height:14px}
+  .session-step-title h3{font-size:.95rem}
+  .session-step-subtitle{font-size:.65rem}
+  .session-step-toggle{width:26px;height:26px}
+  .session-step-toggle svg{width:11px;height:11px}
+  .session-step-content{padding:0 1rem 1rem 1rem}
+  .session-step-content p{font-size:.82rem;line-height:1.7;margin-bottom:.7rem}
+  .session-step.active .session-step-body{max-height:450px}
+  .ssd-item{font-size:.65rem;padding:.28rem .6rem}
 }
 
 /* ════════════════ WORKSHOPS ════════════════ */
@@ -534,10 +641,29 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .gallery-zoom svg{width:18px;height:18px;color:white}
 
 @media(max-width:768px){
+  .workshops{padding:4rem 1.5rem}
+  .workshops-desc{font-size:.9rem;line-height:1.7;margin-bottom:2rem}
+  .workshop-pills{gap:.5rem;margin-bottom:2rem}
+  .workshop-pill{padding:.45rem 1.1rem;font-size:.76rem}
+  .workshop-info-popup.visible{max-height:160px;padding:.7rem 1.2rem}
+  .workshop-info-popup p{font-size:.82rem;line-height:1.6}
+  .gallery-drag-hint{margin-bottom:.8rem;font-size:.65rem}
+  .gallery-scroll{margin:0 -1.5rem;padding:0 1.5rem}
   .gallery-item{flex:0 0 260px}
+  .gallery-track{gap:1rem}
 }
 @media(max-width:480px){
-  .gallery-item{flex:0 0 220px}
+  .workshops{padding:3rem 1rem}
+  .workshops-desc{font-size:.85rem;line-height:1.65}
+  .workshop-pills{gap:.4rem;margin-bottom:1.5rem}
+  .workshop-pill{padding:.4rem .9rem;font-size:.72rem}
+  .workshop-info-popup.visible{max-height:200px}
+  .workshop-info-popup p{font-size:.78rem}
+  .gallery-scroll{margin:0 -1rem;padding:0 1rem}
+  .gallery-item{flex:0 0 220px;border-radius:1rem}
+  .gallery-track{gap:.8rem}
+  .gallery-item .gallery-zoom{width:34px;height:34px}
+  .gallery-zoom svg{width:15px;height:15px}
 }
 
 /* ════════════════ LIGHTBOX ════════════════ */
@@ -566,6 +692,19 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 
 /* Interactive bloom canvas */
 .bloom-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0}
+
+@media(max-width:768px){
+  .mission{padding:4rem 1.5rem}
+  .mission-icon{margin-bottom:1rem}
+  .mission-icon svg{width:44px;height:44px}
+  .mission-text{line-height:1.8}
+}
+@media(max-width:480px){
+  .mission{padding:3rem 1rem}
+  .mission-icon{margin-bottom:.8rem}
+  .mission-icon svg{width:36px;height:36px}
+  .mission-text{line-height:1.7}
+}
 
 /* ════════════════ FAQ ════════════════ */
 .faq{padding:var(--s9) 2rem;background:var(--cream-dark)}
@@ -597,6 +736,28 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .faq-vote.voted{border-color:var(--terra);color:var(--terra);background:var(--terra-faint);
   transform:scale(1.1)}
 .faq-vote.voted-no{border-color:var(--gray-light);color:var(--gray);background:rgba(0,0,0,.03)}
+
+@media(max-width:768px){
+  .faq{padding:4rem 1.5rem}
+  .faq-header{margin-bottom:2rem}
+  .faq-q{padding:1.2rem 0;gap:1rem}
+  .faq-q h3{font-size:1.05rem}
+  .faq-toggle{width:30px;height:30px}
+  .faq-toggle svg{width:12px;height:12px}
+  .faq-a p{font-size:.86rem;line-height:1.7;padding-bottom:.8rem}
+  .faq-helpful{font-size:.68rem;padding-bottom:1rem}
+  .faq-vote{width:26px;height:26px}
+}
+@media(max-width:480px){
+  .faq{padding:3rem 1rem}
+  .faq-header{margin-bottom:1.5rem}
+  .faq-q{padding:1rem 0;gap:.8rem}
+  .faq-q h3{font-size:.95rem}
+  .faq-toggle{width:28px;height:28px}
+  .faq-a p{font-size:.82rem;line-height:1.65}
+  .faq-helpful{font-size:.65rem}
+  .faq-vote{width:24px;height:24px}
+}
 
 /* ════════════════ THERAPIST ════════════════ */
 .therapist{padding:var(--s9) 2rem;background:var(--deep);color:var(--cream);
@@ -637,6 +798,36 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   transition:all .3s var(--ease)}
 .credential:hover{background:rgba(255,255,255,.12);color:var(--cream);transform:translateY(-2px)}
 
+@media(max-width:768px){
+  .therapist{padding:4rem 1.5rem}
+  .therapist-inner{gap:2.5rem}
+  .therapist-photo{max-width:280px}
+  .therapist-photo img{border-radius:1.5rem}
+  .therapist-photo-frame{inset:-8px;border-radius:1.8rem}
+  .therapist-photo-frame:nth-of-type(3){inset:-16px;border-radius:2rem}
+  .therapist-info p{font-size:.86rem;line-height:1.75;margin-bottom:1rem}
+  .therapist-timeline{padding-left:1.5rem;margin:1.5rem 0}
+  .tl-item{padding:.5rem 0 .5rem .8rem}
+  .tl-content{font-size:.78rem}
+  .credentials{gap:.4rem;margin-top:1.5rem}
+  .credential{padding:.35rem .8rem;font-size:.68rem}
+}
+@media(max-width:480px){
+  .therapist{padding:3rem 1rem}
+  .therapist-inner{gap:2rem}
+  .therapist-photo{max-width:240px}
+  .therapist-photo img{border-radius:1.2rem}
+  .therapist-photo-frame{inset:-6px;border-radius:1.5rem}
+  .therapist-photo-frame:nth-of-type(3){inset:-12px;border-radius:1.7rem}
+  .therapist-info p{font-size:.82rem;line-height:1.7;margin-bottom:.8rem}
+  .therapist-timeline{padding-left:1.2rem;margin:1.2rem 0}
+  .tl-dot{left:-1.85rem;width:8px;height:8px}
+  .tl-item::before{font-size:.55rem}
+  .tl-content{font-size:.75rem;line-height:1.45}
+  .credentials{gap:.35rem;margin-top:1.2rem}
+  .credential{padding:.3rem .7rem;font-size:.65rem}
+}
+
 /* ════════════════ CONTACT ════════════════ */
 .contact{padding:var(--s9) 2rem;position:relative}
 .contact-inner{max-width:900px;margin:0 auto;text-align:center}
@@ -670,6 +861,29 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .copy-btn.copied{border-color:var(--terra);color:var(--terra);background:var(--terra-faint)}
 .copy-btn svg{flex-shrink:0}
 
+@media(max-width:768px){
+  .contact{padding:4rem 1.5rem}
+  .contact-header{margin-bottom:1rem}
+  .contact-desc{font-size:.9rem;line-height:1.7;margin-bottom:2rem}
+  .contact-cards{gap:1rem}
+  .contact-card{padding:1.8rem 1.5rem;border-radius:1.2rem}
+  .contact-card-icon{width:44px;height:44px;margin-bottom:1rem}
+  .contact-card-icon svg{width:20px;height:20px}
+  .contact-card h4{font-size:1rem;margin-bottom:.4rem}
+  .contact-card p,.contact-card a{font-size:.82rem}
+}
+@media(max-width:480px){
+  .contact{padding:3rem 1rem}
+  .contact-desc{font-size:.85rem;line-height:1.65}
+  .contact-cards{gap:.8rem}
+  .contact-card{padding:1.5rem 1.2rem;border-radius:1rem}
+  .contact-card-icon{width:40px;height:40px;margin-bottom:.8rem}
+  .contact-card-icon svg{width:18px;height:18px}
+  .contact-card h4{font-size:.95rem}
+  .contact-card p,.contact-card a{font-size:.8rem;line-height:1.6}
+  .copy-btn{font-size:.6rem;padding:.25rem .65rem}
+}
+
 /* ════════════════ FOOTER ════════════════ */
 .footer{padding:2.5rem 2rem;background:var(--deep);color:rgba(255,255,255,.35);
   text-align:center;font-size:.78rem;line-height:1.8}
@@ -698,18 +912,55 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   .credentials{justify-content:center}
 }
 @media(max-width:768px){
+  .nav{padding:1rem 1.5rem}
+  .nav.scrolled{padding:.6rem 1.5rem}
+  .nav-butterfly{width:34px;height:34px}
+  .nav-logo-text{font-size:1.05rem}
   .nav-links{display:none}
   .hamburger{display:flex}
   .nav-therapist-info{display:none}
   .nav-therapist{padding:.2rem;border:none;background:none;backdrop-filter:none;margin-left:auto;margin-right:.5rem}
   .nav-therapist:hover{box-shadow:none;transform:none}
-  .hero{padding:7rem 1.5rem 4rem}
+  .nav-therapist img{width:30px;height:30px}
+  .mobile-menu{padding:5rem 2rem 2rem}
+  .mobile-menu a{font-size:1.4rem}
+  .hero{padding:5.5rem 1.5rem 4.5rem}
+  .hero-portrait{width:110px;height:110px}
+  .hero-portrait-ring{inset:-8px}
+  .hero-intro{gap:.4rem;margin-bottom:1.4rem}
+  .hero h1{margin-bottom:1.2rem}
+  .hero-sub{margin-bottom:2rem}
+  .section-tag{font-size:.65rem;padding:.3rem .9rem;margin-bottom:1rem}
+  .section-tag svg{width:12px;height:12px}
+  .section-subtitle{font-size:.9rem;line-height:1.65}
+  .section-divider{width:48px;margin-top:1.2rem}
   .contact-cards{grid-template-columns:1fr}
+  .footer{padding:2rem 1.5rem;font-size:.72rem}
+  .btt{width:42px;height:42px;bottom:1.5rem;right:1.5rem}
+  .btt svg{width:16px;height:16px}
   .cursor-dot,.cursor-ring{display:none!important}
 }
 @media(max-width:480px){
+  .nav{padding:.8rem 1rem}
+  .nav.scrolled{padding:.5rem 1rem}
+  .nav-butterfly{width:30px;height:30px}
+  .nav-logo-text{font-size:.95rem}
+  .nav-therapist img{width:28px;height:28px}
+  .mobile-menu{padding:4.5rem 1.5rem 1.5rem}
+  .mobile-menu a{font-size:1.2rem;gap:1rem}
   .hero-actions{flex-direction:column;align-items:stretch}
-  .btn{justify-content:center}
+  .btn{justify-content:center;font-size:.78rem;padding:.7rem 1.4rem}
   .section-title{font-size:1.8rem}
-  .slide-inner{padding:1.5rem}
+  .section-subtitle{font-size:.85rem;line-height:1.6}
+  .section-tag{font-size:.6rem;padding:.25rem .75rem;margin-bottom:.8rem}
+  .section-divider{width:40px;margin-top:1rem}
+  .hero-portrait{width:90px;height:90px}
+  .hero-portrait-ring{inset:-6px}
+  .hero-intro-name{font-size:.9rem}
+  .hero-intro{gap:.35rem;margin-bottom:1.2rem}
+  .hero h1{margin-bottom:1rem}
+  .hero-sub{margin-bottom:1.5rem;font-size:.92rem}
+  .footer{padding:1.5rem 1rem;font-size:.68rem;line-height:1.7}
+  .btt{width:38px;height:38px;bottom:1.2rem;right:1.2rem}
+  .btt svg{width:14px;height:14px}
 }
