@@ -1082,7 +1082,17 @@
 
   /* ═══════════════ LIGHTBOX ═══════════════ */
   const lb = document.getElementById('lightbox'), lbi = document.getElementById('lbImg');
-  window.openLightbox = el => { const img = el.querySelector('img'); if (img) { lbi.src = img.src; lb.classList.add('active'); document.body.style.overflow = 'hidden'; } };
+  const lbTWrap = document.getElementById('lbTherapistWrap'), lbTImg = document.getElementById('lbTherapistImg');
+  window.openLightbox = el => {
+    const img = el.querySelector('img'); if (!img) return;
+    const isTherapist = el.classList.contains('nav-therapist');
+    if (isTherapist) {
+      lbTImg.src = img.src; lbTWrap.style.display = ''; lbi.style.display = 'none';
+    } else {
+      lbi.src = img.src; lbi.style.display = ''; lbTWrap.style.display = 'none';
+    }
+    lb.classList.add('active'); document.body.style.overflow = 'hidden';
+  };
   window.closeLightbox = () => { lb.classList.remove('active'); document.body.style.overflow = ''; };
   lb.addEventListener('click', e => { if (e.target === lb) closeLightbox(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
