@@ -241,6 +241,9 @@
   /* ─── VANTA.JS BIRDS HERO BACKGROUND ─── */
   if (typeof VANTA !== 'undefined' && VANTA.BIRDS) {
     try {
+      const vw = window.innerWidth;
+      // Smooth lerp: scales linearly from small screens (400px) to large (1200px)
+      const t = Math.min(1, Math.max(0, (vw - 400) / 800)); // 0 at 400px, 1 at 1200px+
       VANTA.BIRDS({
         el: '#heroVanta',
         mouseControls: true,
@@ -254,13 +257,13 @@
         color1: 0x6B3FA0,
         color2: 0xA0334D,
         colorMode: 'lerp',
-        birdSize: 1.2,
-        wingSpan: 25.0,
-        speedLimit: 4.0,
+        birdSize: 2.5 - t * 1.3,         // 2.5 → 1.2
+        wingSpan: 50.0 - t * 25.0,        // 50 → 25
+        speedLimit: 1.0 + t * 3.0,        // 1 → 4
         separation: 30.0,
         alignment: 30.0,
         cohesion: 25.0,
-        quantity: 3.0
+        quantity: t < 0.5 ? 2.0 : 3.0
       });
     } catch(e) { /* Vanta may fail silently */ }
   }

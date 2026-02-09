@@ -1020,11 +1020,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   .therapist-info{text-align:center}
   .credentials{justify-content:center}
 }
-@media(max-width:768px){
-  .nav{padding:1rem 1.5rem}
-  .nav.scrolled{padding:.6rem 1.5rem}
-  .nav-logo-img{width:34px;height:34px}
-  .nav-logo-text{font-size:1.05rem}
+@media(max-width:1260px){
   .nav-links{display:none}
   .hamburger{display:flex}
   .nav-therapist-info{display:none}
@@ -1033,6 +1029,12 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   .nav-therapist img{width:30px;height:30px}
   .mobile-menu{padding:5rem 2rem 2rem}
   .mobile-menu a{font-size:1.4rem}
+}
+@media(max-width:768px){
+  .nav{padding:1rem 1.5rem}
+  .nav.scrolled{padding:.6rem 1.5rem}
+  .nav-logo-img{width:34px;height:34px}
+  .nav-logo-text{font-size:1.05rem}
   .hero{padding:4.5rem 1.5rem 5.5rem}
   .hero-logo img{width:180px}
   .hero-logo{margin-bottom:1.5rem}
