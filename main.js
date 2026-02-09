@@ -271,21 +271,9 @@
 
   /* ─── NAV + BTT ─── */
   const nav=document.getElementById('mainNav'),btt=document.querySelector('.btt');
-  const navTherapist=nav.querySelector('.nav-therapist');
-  const heroIntro=document.querySelector('.hero-logo');
-  const heroEl=document.getElementById('hero');
   addEventListener('scroll',()=>{
     nav.classList.toggle('scrolled',scrollY>60);
     btt.classList.toggle('show',scrollY>600);
-    // Crossfade hero portrait → nav therapist pill
-    if(navTherapist&&heroIntro&&heroEl){
-      const trigger=heroEl.offsetHeight*0.45;
-      const range=heroEl.offsetHeight*0.2;
-      const t=Math.min(1,Math.max(0,(scrollY-trigger)/range));
-      heroIntro.style.opacity=String(1-t);
-      heroIntro.style.transform='scale('+(1-t*0.3)+') translateY('+(t*-20)+'px)';
-      navTherapist.classList.toggle('visible',t>0.3);
-    }
     up();
   },{passive:true});
   btt.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));

@@ -120,8 +120,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .nav-therapist{display:flex;align-items:center;gap:.65rem;padding:.35rem .8rem .35rem .35rem;
   border-radius:100px;border:1px solid var(--border);transition:all .4s var(--ease);
   background:rgba(255,255,255,.5);backdrop-filter:blur(8px);margin-left:.5rem;
-  cursor:pointer;font:inherit;opacity:0;pointer-events:none}
-.nav-therapist.visible{opacity:1;pointer-events:auto}
+  cursor:pointer;font:inherit;opacity:1;pointer-events:auto}
 .nav-therapist:hover{border-color:var(--sage-light);background:rgba(255,255,255,.8);
   transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.05)}
 .nav-therapist img{width:34px;height:34px;border-radius:50%;object-fit:cover;
