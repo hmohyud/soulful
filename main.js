@@ -20,7 +20,7 @@
     let mx = 0, my = 0, rx = 0, ry = 0;
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = (mx-4)+'px'; dot.style.top = (my-4)+'px'; });
     (function cl() { rx+=(mx-rx)*.1; ry+=(my-ry)*.1; ring.style.left=(rx-22)+'px'; ring.style.top=(ry-22)+'px'; requestAnimationFrame(cl); })();
-    const sel = 'a,button,.faq-q,.gallery-item,.benefit-card,.workshop-pill,.credential,.btt,.magnetic,.paint-color,.paint-clear,.tcard,.copy-btn,.tl-item,.garden-seed';
+    const sel = 'a,button,.faq-q,.gallery-item,.benefit-card,.workshop-pill,.credential,.btt,.paint-color,.paint-clear,.tcard,.copy-btn,.tl-item,.pw-node,.pw-pointer';
     document.addEventListener('mouseover', e => { if(e.target.closest(sel)){dot.classList.add('hovering');ring.classList.add('hovering');} });
     document.addEventListener('mouseout', e => { if(e.target.closest(sel)){dot.classList.remove('hovering');ring.classList.remove('hovering');} });
   }
@@ -29,7 +29,7 @@
   const bgC = document.getElementById('bgCanvas');
   if (bgC) {
     const bc = bgC.getContext('2d'), pts = [];
-    const cols = ['rgba(163,196,160,.25)','rgba(198,123,92,.18)','rgba(107,76,110,.12)','rgba(212,160,160,.18)','rgba(201,169,110,.15)','rgba(107,143,113,.2)'];
+    const cols = ['rgba(163,196,160,.2)','rgba(198,123,92,.18)','rgba(155,122,158,.18)','rgba(212,160,160,.2)','rgba(201,169,110,.15)','rgba(155,122,158,.12)'];
     function rz() { bgC.width=innerWidth; bgC.height=innerHeight; }
     rz(); addEventListener('resize', rz);
     for(let i=0;i<12;i++) pts.push({x:Math.random()*bgC.width,y:Math.random()*bgC.height,r:Math.random()*130+70,c:cols[i%cols.length],vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25});
@@ -111,383 +111,6 @@
   });
 
 
-  /* ═══════════════════════════════════════════════════════════════
-     ★ HEALING GARDEN — Interactive click-to-bloom journey
-     ═══════════════════════════════════════════════════════════════ */
-  (() => {
-    const STEPS = [
-      { title: 'Discover', desc: 'your inner world — through the transformative language of art', color: '#a3c4a0' },
-      { title: 'Express',  desc: 'emotions freely — in a safe, non-judgmental space', color: '#c67b5c' },
-      { title: 'Create',   desc: 'something meaningful — no artistic skill required', color: '#9b7a9e' },
-      { title: 'Heal',     desc: 'from within — processing pain through the act of making', color: '#d4a0a0' },
-      { title: 'Grow',     desc: 'into wholeness — building resilience, confidence, and self-awareness', color: '#c9a96e' },
-    ];
-
-    const garden = document.getElementById('garden');
-    if (!garden) return;
-    const canvas = document.getElementById('gardenCanvas');
-    const ctx = canvas.getContext('2d');
-    const textEl = document.getElementById('gardenText');
-    const wordEl = document.getElementById('gardenWord');
-    const descEl = document.getElementById('gardenDesc');
-    const hintEl = document.getElementById('gardenHint');
-
-    let W, H, dpr;
-    let time = 0, visible = false;
-    const bloomed = [false, false, false, false, false];
-    const bloomProgress = [0, 0, 0, 0, 0]; // 0-1 animation
-    const particles = [];
-    let curStep = 0;
-
-    // Floating particles for ambiance
-    for (let i = 0; i < 25; i++) {
-      particles.push({
-        x: Math.random(), y: Math.random() * 0.6,
-        r: 1 + Math.random() * 2, spd: 0.0001 + Math.random() * 0.0002,
-        phase: Math.random() * Math.PI * 2, alpha: 0.1 + Math.random() * 0.15
-      });
-    }
-
-    new IntersectionObserver(e => { visible = e[0].isIntersecting; }, { threshold: 0.05 }).observe(garden);
-
-    function resize() {
-      dpr = devicePixelRatio || 1;
-      W = garden.clientWidth; H = garden.clientHeight;
-      canvas.width = W * dpr; canvas.height = H * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    function seedX(i) { return W * (0.1 + (i / (STEPS.length - 1)) * 0.8); }
-    function groundY() { return H * 0.75; }
-
-    function drawGround() {
-      // Soil/grass line
-      const gy = groundY();
-      ctx.beginPath();
-      ctx.moveTo(0, gy);
-      for (let x = 0; x <= W; x += 2) {
-        ctx.lineTo(x, gy + Math.sin(x * 0.03 + time * 0.5) * 3);
-      }
-      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
-      const grd = ctx.createLinearGradient(0, gy, 0, H);
-      grd.addColorStop(0, '#7a9e6a');
-      grd.addColorStop(0.3, '#5d8a4c');
-      grd.addColorStop(1, '#4a7340');
-      ctx.fillStyle = grd;
-      ctx.fill();
-
-      // Grass blades
-      for (let x = 5; x < W; x += 8) {
-        const bh = 6 + Math.sin(x * 0.1) * 4;
-        const sway = Math.sin(time * 1.5 + x * 0.05) * 3;
-        ctx.beginPath();
-        ctx.moveTo(x, gy + Math.sin(x * 0.03 + time * 0.5) * 3);
-        ctx.quadraticCurveTo(x + sway, gy - bh * 0.6, x + sway * 1.5, gy - bh);
-        ctx.strokeStyle = 'rgba(100,160,80,' + (0.2 + Math.random() * 0.15) + ')';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-    }
-
-    // Helper: parse hex to rgb
-    function hexRgb(hex) {
-      const v = parseInt(hex.slice(1), 16);
-      return [(v >> 16) & 255, (v >> 8) & 255, v & 255];
-    }
-
-    function drawSeed(i) {
-      const sx = seedX(i);
-      const sy = groundY() + Math.sin(sx * 0.03 + time * 0.5) * 3;
-      const bp = bloomProgress[i];
-      const col = STEPS[i].color;
-      const [cr, cg, cb] = hexRgb(col);
-
-      if (bp < 0.01 && !bloomed[i]) {
-        // Glowing orb seed with the step's color
-        const bob = Math.sin(time * 2 + i) * 3;
-        ctx.save();
-        ctx.translate(sx, sy - 12 + bob);
-
-        // Outer glow
-        const pulse = 0.5 + 0.5 * Math.sin(time * 2.5 + i * 1.3);
-        const glowR = 18 + pulse * 8;
-        const glow = ctx.createRadialGradient(0, 0, 2, 0, 0, glowR);
-        glow.addColorStop(0, 'rgba(' + cr + ',' + cg + ',' + cb + ',' + (0.35 + pulse * 0.15) + ')');
-        glow.addColorStop(0.5, 'rgba(' + cr + ',' + cg + ',' + cb + ',' + (0.1 + pulse * 0.05) + ')');
-        glow.addColorStop(1, 'rgba(' + cr + ',' + cg + ',' + cb + ',0)');
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(0, 0, glowR, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Core orb
-        const coreG = ctx.createRadialGradient(-2, -2, 1, 0, 0, 8);
-        coreG.addColorStop(0, 'rgba(255,255,255,0.9)');
-        coreG.addColorStop(0.4, col);
-        coreG.addColorStop(1, 'rgba(' + cr + ',' + cg + ',' + cb + ',0.6)');
-        ctx.fillStyle = coreG;
-        ctx.beginPath();
-        ctx.arc(0, 0, 8, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Specular highlight
-        ctx.beginPath();
-        ctx.arc(-2, -3, 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,' + (0.5 + pulse * 0.3) + ')';
-        ctx.fill();
-
-        // Tiny orbiting sparkles
-        for (let s = 0; s < 3; s++) {
-          const angle = time * 1.5 + s * (Math.PI * 2 / 3) + i * 0.7;
-          const dist = 14 + Math.sin(time * 2 + s + i) * 3;
-          const px = Math.cos(angle) * dist;
-          const py = Math.sin(angle) * dist;
-          ctx.beginPath();
-          ctx.arc(px, py, 1 + 0.5 * Math.sin(time * 4 + s), 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(255,255,255,' + (0.2 + 0.3 * Math.sin(time * 3 + s * 2)) + ')';
-          ctx.fill();
-        }
-
-        ctx.restore();
-      }
-
-      if (bp > 0) {
-        // Draw growing flower
-        const stemH = bp * 70;
-        const petalSize = Math.min(1, bp * 1.5) * 20;
-
-        ctx.save();
-        ctx.translate(sx, sy);
-
-        // Stem with slight curve
-        const sway = Math.sin(time * 1.2 + i) * 4 * bp;
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.bezierCurveTo(sway * 0.5, -stemH * 0.3, sway, -stemH * 0.6, sway * 0.5, -stemH);
-        ctx.strokeStyle = '#4a8040';
-        ctx.lineWidth = 2.5 - bp * 0.3;
-        ctx.lineCap = 'round';
-        ctx.stroke();
-
-        // Leaves (appear at 25%+)
-        if (bp > 0.25) {
-          const leafP = Math.min(1, (bp - 0.25) / 0.25);
-          for (let side = -1; side <= 1; side += 2) {
-            const lPosY = -stemH * (side === -1 ? 0.35 : 0.55);
-            const lPosX = sway * (side === -1 ? 0.25 : 0.4);
-            ctx.save();
-            ctx.translate(lPosX, lPosY);
-            ctx.rotate(side * 0.5 + Math.sin(time * 0.8 + i) * 0.08);
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.quadraticCurveTo(side * 10 * leafP, -4 * leafP, side * 14 * leafP, 1 * leafP);
-            ctx.quadraticCurveTo(side * 8 * leafP, 3 * leafP, 0, 0);
-            ctx.fillStyle = 'rgba(90,160,70,' + (0.5 + leafP * 0.3) + ')';
-            ctx.fill();
-            // Leaf vein
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(side * 10 * leafP, -1 * leafP);
-            ctx.strokeStyle = 'rgba(60,120,50,0.3)';
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-            ctx.restore();
-          }
-        }
-
-        // Flower head (appears at 45%+)
-        if (bp > 0.45) {
-          const flowerP = Math.min(1, (bp - 0.45) / 0.55);
-          const fx = sway * 0.5;
-          const fy = -stemH;
-          const petalCount = 7;
-
-          // Petal layers (two layers for depth)
-          for (let layer = 0; layer < 2; layer++) {
-            const layerOffset = layer * (Math.PI / petalCount);
-            const layerAlpha = layer === 0 ? 0.3 : 0.55;
-            const layerScale = layer === 0 ? 1.15 : 1;
-
-            for (let p = 0; p < petalCount; p++) {
-              const angle = (p / petalCount) * Math.PI * 2 + time * 0.2 + i + layerOffset;
-              const pr = petalSize * flowerP * layerScale;
-              ctx.save();
-              ctx.translate(fx, fy);
-              ctx.rotate(angle);
-              ctx.beginPath();
-              ctx.moveTo(0, 0);
-              ctx.quadraticCurveTo(pr * 0.35, -pr * 0.3, pr * 0.85, 0);
-              ctx.quadraticCurveTo(pr * 0.35, pr * 0.3, 0, 0);
-              ctx.fillStyle = col;
-              ctx.globalAlpha = layerAlpha * flowerP;
-              ctx.fill();
-              ctx.restore();
-            }
-          }
-
-          // Golden center with gradient
-          const centerR = 5 * flowerP;
-          const cenG = ctx.createRadialGradient(fx, fy, 0, fx, fy, centerR);
-          cenG.addColorStop(0, '#e8c86a');
-          cenG.addColorStop(0.7, '#c9a96e');
-          cenG.addColorStop(1, 'rgba(180,140,80,0.4)');
-          ctx.globalAlpha = flowerP;
-          ctx.fillStyle = cenG;
-          ctx.beginPath();
-          ctx.arc(fx, fy, centerR, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Center dots
-          ctx.globalAlpha = flowerP * 0.6;
-          for (let d = 0; d < 5; d++) {
-            const da = (d / 5) * Math.PI * 2 + time * 0.5;
-            ctx.beginPath();
-            ctx.arc(fx + Math.cos(da) * 2.5, fy + Math.sin(da) * 2.5, 0.8, 0, Math.PI * 2);
-            ctx.fillStyle = '#a08040';
-            ctx.fill();
-          }
-
-          // Sparkles and floating petals when bloomed
-          if (bp >= 1) {
-            ctx.globalAlpha = 1;
-            for (let s = 0; s < 5; s++) {
-              const sa = time * 1.5 + s * 1.25 + i;
-              const sr = 22 + Math.sin(time * 2 + s) * 10;
-              const sparkX = fx + Math.cos(sa) * sr;
-              const sparkY = fy + Math.sin(sa) * sr * 0.7;
-              const sparkAlpha = 0.15 + 0.35 * Math.sin(time * 3 + s * 1.7);
-
-              // Star-shaped sparkle
-              ctx.save();
-              ctx.translate(sparkX, sparkY);
-              ctx.rotate(time * 2 + s);
-              ctx.beginPath();
-              for (let p = 0; p < 4; p++) {
-                const a = (p / 4) * Math.PI * 2;
-                ctx.moveTo(0, 0);
-                ctx.lineTo(Math.cos(a) * 3, Math.sin(a) * 3);
-              }
-              ctx.strokeStyle = 'rgba(255,255,255,' + sparkAlpha + ')';
-              ctx.lineWidth = 0.8;
-              ctx.stroke();
-              ctx.restore();
-            }
-          }
-        }
-
-        ctx.globalAlpha = 1;
-        ctx.restore();
-      }
-    }
-
-    function drawParticles() {
-      particles.forEach(p => {
-        const py = p.y * H + Math.sin(time * 0.8 + p.phase) * 10;
-        ctx.beginPath();
-        ctx.arc(p.x * W, py, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,' + p.alpha * (0.5 + 0.5 * Math.sin(time + p.phase)) + ')';
-        ctx.fill();
-        p.x += p.spd;
-        if (p.x > 1.05) p.x = -0.05;
-      });
-    }
-
-
-    // Labels under seeds
-    function drawLabels() {
-      ctx.textAlign = 'center';
-      ctx.font = '600 10px Outfit, sans-serif';
-      const gy = groundY();
-      STEPS.forEach((s, i) => {
-        const sx = seedX(i);
-        const sy = gy + 20;
-        ctx.fillStyle = bloomed[i] ? 'rgba(26,47,42,0.7)' : 'rgba(26,47,42,0.3)';
-        ctx.fillText(s.title.toUpperCase(), sx, sy);
-      });
-    }
-
-    function frame() {
-      if (visible) {
-        time += 0.016;
-        ctx.clearRect(0, 0, W, H);
-
-        drawParticles();
-        drawGround();
-        for (let i = 0; i < STEPS.length; i++) {
-          if (bloomed[i] && bloomProgress[i] < 1) {
-            bloomProgress[i] = Math.min(1, bloomProgress[i] + 0.008);
-          }
-          drawSeed(i);
-        }
-        drawLabels();
-      }
-      requestAnimationFrame(frame);
-    }
-
-    function updateText(idx) {
-      textEl.classList.add('fading');
-      setTimeout(() => {
-        curStep = idx;
-        wordEl.textContent = STEPS[idx].title;
-        descEl.textContent = STEPS[idx].desc;
-        textEl.classList.remove('fading');
-      }, 200);
-    }
-
-    // Click detection
-    function handleClick(e) {
-      const rect = garden.getBoundingClientRect();
-      const ev = e.touches ? e.touches[0] : e;
-      const cx = ev.clientX - rect.left;
-      const cy = ev.clientY - rect.top;
-
-      for (let i = 0; i < STEPS.length; i++) {
-        const sx = seedX(i);
-        const sy = groundY() - 8;
-        const dist = Math.sqrt((cx - sx) ** 2 + (cy - sy) ** 2);
-        if (dist < 30) {
-          if (!bloomed[i]) {
-            bloomed[i] = true;
-            bloomProgress[i] = 0.01;
-            updateText(i);
-            if (hintEl && !hintEl.classList.contains('hidden')) {
-              hintEl.classList.add('hidden');
-            }
-          } else {
-            updateText(i);
-          }
-          break;
-        }
-      }
-    }
-
-    garden.addEventListener('click', handleClick);
-    garden.addEventListener('touchend', e => {
-      if (e.changedTouches && e.changedTouches[0]) {
-        const rect = garden.getBoundingClientRect();
-        const cx = e.changedTouches[0].clientX - rect.left;
-        const cy = e.changedTouches[0].clientY - rect.top;
-        for (let i = 0; i < STEPS.length; i++) {
-          const sx = seedX(i);
-          const sy = groundY() - 8;
-          if (Math.sqrt((cx - sx) ** 2 + (cy - sy) ** 2) < 30) {
-            if (!bloomed[i]) {
-              bloomed[i] = true;
-              bloomProgress[i] = 0.01;
-              updateText(i);
-              if (hintEl && !hintEl.classList.contains('hidden')) hintEl.classList.add('hidden');
-            } else {
-              updateText(i);
-            }
-            break;
-          }
-        }
-      }
-    });
-
-    resize(); frame();
-    addEventListener('resize', resize);
-  })();
 
 
 
@@ -552,7 +175,7 @@
     if (!canvas) return;
     const bc = canvas.getContext('2d');
     let W, H, mx = 0.5, my = 0.5, vis = false;
-    const colors = ['#a3c4a0', '#c67b5c', '#9b7a9e', '#d4a0a0', '#c9a96e', '#6b8f71'];
+    const colors = ['#a3c4a0', '#c67b5c', '#9b7a9e', '#d4a0a0', '#c9a96e', '#9b7a9e'];
 
     function rz() {
       const r = canvas.parentElement.getBoundingClientRect(), d = devicePixelRatio || 1;
@@ -752,43 +375,268 @@
   })();
 
 
-  /* ═══════════════ SESSION STEPS (interactive accordion) ═══════════════ */
+  /* ═══════════════ PROCESS WHEEL (orbital W2 with draggable pointer) ═══════════════ */
   (() => {
-    const steps = document.querySelectorAll('.session-step');
-    if (!steps.length) return;
+    const wrap = document.getElementById('processWheel');
+    if (!wrap) return;
 
-    steps.forEach(step => {
-      const header = step.querySelector('.session-step-header');
-      if (!header) return;
+    const STEPS = [
+      { title:'Initial Assessment', short:'Assess', sub:'Understanding your unique needs', ic:1, clr:1,
+        desc:'Meet with an experienced art therapist to discuss your goals, concerns, and what you hope to achieve. Every journey begins with understanding — we take the time to listen, learn about your history, and create a personalized path forward.',
+        tags:['45\u201360 minutes','Safe & confidential','One-on-one setting'] },
+      { title:'Artistic Exploration', short:'Create', sub:'Creating without judgment', ic:2, clr:2,
+        desc:'Engage in creative activities — painting, drawing, sculpture, or collage. No artistic skill required; the focus is entirely on the process, not the product.',
+        tags:['Multiple art mediums','No skill required','Process over product'] },
+      { title:'Reflect & Share', short:'Reflect', sub:'Finding meaning in your creation', ic:3, clr:3,
+        desc:'Discuss your creation with your therapist in a supportive, non-judgmental environment. Together, explore the themes, emotions, and symbols that emerge from your artwork.',
+        tags:['Guided dialogue','Deep self-reflection','Non-judgmental space'] },
+      { title:'Coping Strategies', short:'Cope', sub:'Building your emotional toolkit', ic:4, clr:4,
+        desc:'Learn techniques to manage stress, anxiety, and emotional challenges that you can apply in everyday life. Art-based coping strategies become tools you carry with you.',
+        tags:['Practical techniques','Take-home exercises','Everyday application'] },
+      { title:'Progress & Growth', short:'Grow', sub:'Witnessing your transformation', ic:5, clr:5,
+        desc:'Notice positive changes in your well-being, self-awareness, and personal growth. The creative process reveals patterns of transformation over time.',
+        tags:['Measurable progress','Lasting empowerment','Ongoing support'] }
+    ];
 
-      header.addEventListener('click', () => {
-        const wasActive = step.classList.contains('active');
+    const ICONS = [
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688"/><circle cx="7.5" cy="10" r="1.5" fill="currentColor"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><circle cx="16.5" cy="10" r="1.5" fill="currentColor"/></svg>',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/></svg>'
+    ];
 
-        // Close all steps
-        steps.forEach(s => s.classList.remove('active'));
+    const BADGE_COLORS = ['#9b7a9e','#c67b5c','#d4a0a0','#a3c4a0','#c9a96e'];
+    const N = STEPS.length;
 
-        // Open clicked step if it wasn't already open
-        if (!wasActive) {
-          step.classList.add('active');
-        }
-      });
+    const wheelEl = wrap.querySelector('.pw-wheel');
+    const detailEl = document.getElementById('pwDetail');
+    const pointer = document.getElementById('pwPointer');
+    const dragLabel = document.getElementById('pwDragLabel');
+    const hubIcon = wrap.querySelector('.pw-hub-icon');
+    const hubTitle = wrap.querySelector('.pw-hub-title');
+    const hubStep = wrap.querySelector('.pw-hub-step');
+    const GRIP_W = 48, GRIP_H = 26; // pill dimensions
+
+    // Responsive radius
+    function getWheelSize() {
+      const w = wheelEl.offsetWidth;
+      return { radius: w * 0.435, nodeSize: w <= 260 ? 32 : (w <= 300 ? 38 : 46), svgSize: w + 6, center: w / 2 };
+    }
+
+    // Build nodes
+    const nodeEls = [];
+    STEPS.forEach((s, i) => {
+      const node = document.createElement('div');
+      node.className = 'pw-node pw-c' + s.clr + (i === 0 ? ' active' : '');
+      node.innerHTML = ICONS[i] + '<div class="pw-pulse"></div><span class="pw-node-label">' + s.short + '</span>';
+      node.addEventListener('click', () => goTo(i));
+      wheelEl.appendChild(node);
+      nodeEls.push(node);
     });
 
-    // Auto-open first step after a short delay when section comes into view
-    const sessionsSection = document.getElementById('sessions');
-    if (sessionsSection) {
-      let opened = false;
-      new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting && !opened) {
-          opened = true;
-          setTimeout(() => {
-            if (!document.querySelector('.session-step.active')) {
-              steps[0].classList.add('active');
-            }
-          }, 600);
-        }
-      }, { threshold: 0.3 }).observe(sessionsSection);
+    // Build panels
+    STEPS.forEach((s, i) => {
+      const panel = document.createElement('div');
+      panel.className = 'pw-panel pw-c' + s.clr + (i === 0 ? ' active' : '');
+      panel.innerHTML =
+        '<div class="pw-badge" style="background:' + BADGE_COLORS[i] + '">Step 0' + (i+1) + '</div>' +
+        '<h3>' + s.title + '</h3>' +
+        '<span class="pw-sub">' + s.sub + '</span>' +
+        '<p>' + s.desc + '</p>' +
+        '<div class="pw-tags">' + s.tags.map(t => '<span>' + t + '</span>').join('') + '</div>';
+      detailEl.appendChild(panel);
+    });
+
+    const panels = detailEl.querySelectorAll('.pw-panel');
+
+    // Position nodes around the orbit
+    function layoutNodes() {
+      const { radius, nodeSize, center } = getWheelSize();
+      STEPS.forEach((s, i) => {
+        const angle = -Math.PI / 2 + (i / N) * Math.PI * 2;
+        const nx = center + Math.cos(angle) * radius - nodeSize / 2;
+        const ny = center + Math.sin(angle) * radius - nodeSize / 2;
+        nodeEls[i].style.left = nx + 'px';
+        nodeEls[i].style.top = ny + 'px';
+        nodeEls[i].style.width = nodeSize + 'px';
+        nodeEls[i].style.height = nodeSize + 'px';
+      });
     }
+    layoutNodes();
+    addEventListener('resize', () => { layoutNodes(); positionPointer(pointerAngle); });
+
+    // Current state
+    let currentIdx = 0;
+    // Track total accumulated angle for the pointer (allows going past 2*PI for wrap)
+    let pointerAngle = -Math.PI / 2; // start at top (Assess position)
+    let targetPointerAngle = -Math.PI / 2;
+    let pointerAnimId = null;
+
+    function nodeAngle(idx) {
+      return -Math.PI / 2 + (idx / N) * Math.PI * 2;
+    }
+
+    function positionPointer(angle) {
+      const { radius, center } = getWheelSize();
+      const pointerR = radius + 38; // further outside the orbit than before
+      const px = center + Math.cos(angle) * pointerR - GRIP_W / 2;
+      const py = center + Math.sin(angle) * pointerR - GRIP_H / 2;
+      pointer.style.left = px + 'px';
+      pointer.style.top = py + 'px';
+      // Rotate the pill so the notch points inward
+      const deg = (angle * 180 / Math.PI) + 90;
+      pointer.style.transform = 'rotate(' + deg + 'deg)';
+
+      // Position the "drag" label further out, always upright
+      const labelR = pointerR + GRIP_H / 2 + 14;
+      const lx = center + Math.cos(angle) * labelR;
+      const ly = center + Math.sin(angle) * labelR;
+      dragLabel.style.left = lx + 'px';
+      dragLabel.style.top = ly + 'px';
+      dragLabel.style.transform = 'translate(-50%,-50%)';
+    }
+
+    function animatePointer(from, to, callback) {
+      if (pointerAnimId) cancelAnimationFrame(pointerAnimId);
+      const duration = 500;
+      const start = performance.now();
+      const diff = to - from;
+      function tick(now) {
+        const elapsed = now - start;
+        const t = Math.min(1, elapsed / duration);
+        // Ease out cubic
+        const ease = 1 - Math.pow(1 - t, 3);
+        pointerAngle = from + diff * ease;
+        positionPointer(pointerAngle);
+        if (t < 1) pointerAnimId = requestAnimationFrame(tick);
+        else { pointerAnimId = null; if (callback) callback(); }
+      }
+      pointerAnimId = requestAnimationFrame(tick);
+    }
+
+    function goTo(idx) {
+      const prevIdx = currentIdx;
+      currentIdx = idx;
+
+      // Update nodes
+      nodeEls.forEach((nd, j) => {
+        nd.classList.remove('active');
+        if (j === idx) nd.classList.add('active');
+      });
+      // Update panels
+      panels.forEach((p, j) => p.classList.toggle('active', j === idx));
+
+      // Update hub
+      hubIcon.className = 'pw-hub-icon ssi-' + STEPS[idx].ic;
+      hubIcon.innerHTML = ICONS[idx];
+      hubTitle.textContent = STEPS[idx].title;
+      hubStep.textContent = 'Step 0' + (idx + 1);
+
+      // Calculate pointer target angle with shortest-path + wrap-around
+      const tgtRaw = nodeAngle(idx);
+      let newTarget;
+
+      if (prevIdx === N - 1 && idx === 0) {
+        // Wrap-around: Grow → Assess = go FORWARD one step (completes the circle)
+        newTarget = pointerAngle + (2 * Math.PI / N);
+      } else if (prevIdx === 0 && idx === N - 1) {
+        // Reverse wrap: Assess → Grow = go BACKWARD one step
+        newTarget = pointerAngle - (2 * Math.PI / N);
+      } else {
+        // Normal: shortest path from current pointer to target node
+        let d = tgtRaw - pointerAngle;
+        // Normalize to [-PI, PI]
+        d = d - Math.round(d / (2 * Math.PI)) * 2 * Math.PI;
+        newTarget = pointerAngle + d;
+      }
+
+      animatePointer(pointerAngle, newTarget);
+    }
+
+    // ── Draggable pointer ──
+    let dragging = false, dragStartAngle = 0;
+
+    function getAngleFromEvent(e) {
+      const { center } = getWheelSize();
+      const rect = wheelEl.getBoundingClientRect();
+      const ev = e.touches ? e.touches[0] : e;
+      const x = ev.clientX - rect.left - center;
+      const y = ev.clientY - rect.top - center;
+      return Math.atan2(y, x);
+    }
+
+    function closestNode(angle) {
+      // Normalize to 0..2PI
+      let a = ((angle + Math.PI / 2) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+      const segSize = (2 * Math.PI) / N;
+      let closest = Math.round(a / segSize) % N;
+      if (closest < 0) closest += N;
+      return closest;
+    }
+
+    // Update node/panel/hub visuals without moving the pointer
+    function selectNode(idx) {
+      if (idx === currentIdx) return;
+      currentIdx = idx;
+      nodeEls.forEach((nd, j) => {
+        nd.classList.remove('active');
+        if (j === idx) nd.classList.add('active');
+      });
+      panels.forEach((p, j) => p.classList.toggle('active', j === idx));
+      hubIcon.className = 'pw-hub-icon ssi-' + STEPS[idx].ic;
+      hubIcon.innerHTML = ICONS[idx];
+      hubTitle.textContent = STEPS[idx].title;
+      hubStep.textContent = 'Step 0' + (idx + 1);
+    }
+
+    pointer.addEventListener('mousedown', startDrag);
+    pointer.addEventListener('touchstart', startDrag, { passive: false });
+
+    function startDrag(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      dragging = true;
+      dragStartAngle = getAngleFromEvent(e);
+      pointer.classList.add('dragging');
+      if (pointerAnimId) { cancelAnimationFrame(pointerAnimId); pointerAnimId = null; }
+    }
+
+    addEventListener('mousemove', onDrag);
+    addEventListener('touchmove', onDrag, { passive: false });
+
+    function onDrag(e) {
+      if (!dragging) return;
+      if (e.cancelable) e.preventDefault();
+      const angle = getAngleFromEvent(e);
+      pointerAngle = angle;
+      positionPointer(angle);
+      // Live-select whichever node the handle is closest to
+      selectNode(closestNode(angle));
+    }
+
+    addEventListener('mouseup', endDrag);
+    addEventListener('touchend', endDrag);
+
+    function endDrag() {
+      if (!dragging) return;
+      dragging = false;
+      pointer.classList.remove('dragging');
+
+      // Snap pointer to the already-selected node
+      const snapAngle = nodeAngle(currentIdx);
+
+      // Find shortest rotation to snap
+      let d = snapAngle - pointerAngle;
+      while (d > Math.PI) d -= 2 * Math.PI;
+      while (d < -Math.PI) d += 2 * Math.PI;
+
+      animatePointer(pointerAngle, pointerAngle + d);
+    }
+
+    // Initialize
+    positionPointer(pointerAngle);
+    goTo(0);
   })();
 
   /* ═══════════════ FAQ ═══════════════ */
@@ -878,7 +726,7 @@
       gc.beginPath();
       gc.moveTo(0, base);
       gc.lineTo(W, base);
-      gc.strokeStyle = '#7a9e6a';
+      gc.strokeStyle = '#a3c4a0';
       gc.lineWidth = 2;
       gc.stroke();
 
@@ -918,7 +766,7 @@
         const leafR = (8 + leafS * 10) * scale;
         gc.beginPath();
         gc.arc(cx - 14 * scale, base - trunkH * 0.6 - 12 * scale, leafR, 0, Math.PI * 2);
-        gc.fillStyle = 'rgba(107,143,113,' + (0.3 + leafS * 0.3) + ')';
+        gc.fillStyle = 'rgba(163,196,160,' + (0.3 + leafS * 0.3) + ')';
         gc.fill();
         gc.beginPath();
         gc.arc(cx + 10 * scale, base - trunkH * 0.75 - 10 * scale, leafR * 0.8, 0, Math.PI * 2);
@@ -1095,10 +943,7 @@
 
   /* ═══════════════ MAGNETIC ═══════════════ */
   if (matchMedia('(pointer:fine)').matches) {
-    document.querySelectorAll('.magnetic').forEach(b => {
-      b.addEventListener('mousemove', e => { const r = b.getBoundingClientRect(); b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * .25}px,${(e.clientY - r.top - r.height / 2) * .25}px)`; });
-      b.addEventListener('mouseleave', () => { b.style.transform = ''; });
-    });
+    /* magnetic effect removed */
   }
 
   /* ═══════════════ CREDENTIAL RIPPLE ═══════════════ */

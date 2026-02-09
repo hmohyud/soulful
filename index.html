@@ -70,7 +70,7 @@
     <a href="#workshops">Workshops</a>
     <a href="#faq">FAQ</a>
     <a href="#therapist">About</a>
-    <a href="#contact" class="nav-cta-btn magnetic"><span>Get in Touch</span></a>
+    <a href="#contact" class="nav-cta-btn"><span>Get in Touch</span></a>
   </div>
   <button class="nav-therapist" onclick="openLightbox(this)" aria-label="View therapist photo">
     <img src="public/mo5b3BibYc9I.png" alt="Fatema Qutbuddin" loading="lazy">
@@ -110,11 +110,11 @@
     <h1>Experience the<br>Transformative Power of<br><em>Art Therapy</em></h1>
     <p class="hero-sub">Explore your emotions, process challenges, and foster personal growth in a safe and supportive environment.</p>
     <div class="hero-actions">
-      <a href="#contact" class="btn btn-fill magnetic">
+      <a href="#contact" class="btn btn-fill">
         <span>Begin Your Healing Journey</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
       </a>
-      <a href="#sessions" class="btn btn-outline magnetic">
+      <a href="#sessions" class="btn btn-outline">
         <span>How It Works</span>
       </a>
     </div>
@@ -126,19 +126,6 @@
   </div>
 </section>
 
-<!-- ═══════════════ HEALING GARDEN (interactive click-to-bloom) ═══════════════ -->
-<section class="garden" id="garden">
-  <canvas id="gardenCanvas"></canvas>
-  <div class="garden-steps" id="gardenSteps"></div>
-  <div class="garden-text" id="gardenText">
-    <span class="garden-word" id="gardenWord">Discover</span>
-    <span class="garden-desc" id="gardenDesc">your inner world — through the transformative language of art</span>
-  </div>
-  <div class="garden-hint" id="gardenHint">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M12 3c-1.5 2-3 4-3 6a3 3 0 1 0 6 0c0-2-1.5-4-3-6z"/><path d="M12 21v-6"/></svg>
-    Click each seed to watch your healing garden bloom
-  </div>
-</section>
 
 
 <!-- ═══════════════ BENEFITS ═══════════════ -->
@@ -359,189 +346,48 @@
     </div>
     <p class="sessions-desc" data-reveal="up">Art therapy recognizes that not all thoughts and feelings can be easily expressed through words alone. Through creating art, individuals communicate, process, and understand their emotions in a unique and non-verbal way.</p>
 
-    <div class="sessions-hint" data-reveal="up">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5"/></svg>
-      Click each step to explore
+    <!-- Orbital wheel with draggable pointer -->
+    <div class="process-wheel" id="processWheel" data-reveal="up">
+      <div class="pw-wheel">
+        <div class="pw-orbit-outer"></div>
+        <div class="pw-orbit"></div>
+        <svg class="pw-svg" viewBox="0 0 346 346">
+          <defs>
+            <linearGradient id="pwGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#a3c4a0"/>
+              <stop offset="25%" stop-color="#c67b5c"/>
+              <stop offset="50%" stop-color="#9b7a9e"/>
+              <stop offset="75%" stop-color="#d4a0a0"/>
+              <stop offset="100%" stop-color="#c9a96e"/>
+            </linearGradient>
+          </defs>
+          <!-- Thin track circle (ghost) -->
+          <circle cx="173" cy="173" r="148" fill="none" stroke="rgba(0,0,0,.04)" stroke-width="3"/>
+        </svg>
+        <!-- Draggable pill-grip handle -->
+        <div class="pw-pointer" id="pwPointer">
+          <div class="pw-grip-body">
+            <span class="pw-grip-line"></span>
+            <span class="pw-grip-line"></span>
+            <span class="pw-grip-line"></span>
+            <div class="pw-grip-notch"></div>
+          </div>
+        </div>
+        <div class="pw-drag-label" id="pwDragLabel">drag</div>
+        <div class="pw-hub">
+          <div class="pw-hub-icon ssi-1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          </div>
+          <div class="pw-hub-title">Initial Assessment</div>
+          <div class="pw-hub-step">Step 01</div>
+        </div>
+        <!-- Nodes will be placed by JS -->
+      </div>
+      <div class="pw-detail" id="pwDetail">
+        <!-- Panels built by JS -->
+      </div>
     </div>
 
-    <div class="session-steps" data-reveal="up">
-
-      <div class="session-step" data-step="1">
-        <div class="session-step-header">
-          <div class="session-step-num">1</div>
-          <div class="session-step-icon ssi-1">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
-          </div>
-          <div class="session-step-title">
-            <h3>Initial Assessment</h3>
-            <span class="session-step-subtitle">Understanding your unique needs</span>
-          </div>
-          <div class="session-step-toggle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="session-step-body">
-          <div class="session-step-content">
-            <p>Meet with an experienced art therapist to discuss your goals, concerns, and what you hope to achieve. Every journey begins with understanding — we take the time to listen, learn about your history, and create a personalized path forward.</p>
-            <div class="session-step-details">
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                <span>45–60 minutes</span>
-              </div>
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                <span>Safe &amp; confidential</span>
-              </div>
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-                <span>One-on-one setting</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="session-step" data-step="2">
-        <div class="session-step-header">
-          <div class="session-step-num">2</div>
-          <div class="session-step-icon ssi-2">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/><circle cx="7.5" cy="10" r="1.5" fill="currentColor"/><circle cx="12" cy="7" r="1.5" fill="currentColor"/><circle cx="16.5" cy="10" r="1.5" fill="currentColor"/></svg>
-          </div>
-          <div class="session-step-title">
-            <h3>Artistic Exploration</h3>
-            <span class="session-step-subtitle">Creating without judgment</span>
-          </div>
-          <div class="session-step-toggle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="session-step-body">
-          <div class="session-step-content">
-            <p>Engage in creative activities — painting, drawing, sculpture, or collage. No artistic skill required; the focus is entirely on the process, not the product. The act of creating itself becomes the pathway to expression and understanding.</p>
-            <div class="session-step-details">
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688"/><circle cx="7.5" cy="10" r="1.5" fill="currentColor"/></svg>
-                <span>Multiple art mediums</span>
-              </div>
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                <span>No skill required</span>
-              </div>
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26"/></svg>
-                <span>Process over product</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="session-step" data-step="3">
-        <div class="session-step-header">
-          <div class="session-step-num">3</div>
-          <div class="session-step-icon ssi-3">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          </div>
-          <div class="session-step-title">
-            <h3>Reflect &amp; Share</h3>
-            <span class="session-step-subtitle">Finding meaning in your creation</span>
-          </div>
-          <div class="session-step-toggle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="session-step-body">
-          <div class="session-step-content">
-            <p>Discuss your creation with your therapist in a supportive, non-judgmental environment. Together, you'll explore the themes, emotions, and symbols that emerge from your artwork — gaining insights into your inner world.</p>
-            <div class="session-step-details">
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                <span>Guided dialogue</span>
-              </div>
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-                <span>Deep self-reflection</span>
-              </div>
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M9 18l6-6-6-6"/></svg>
-                <span>Non-judgmental space</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="session-step" data-step="4">
-        <div class="session-step-header">
-          <div class="session-step-num">4</div>
-          <div class="session-step-icon ssi-4">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <div class="session-step-title">
-            <h3>Coping Strategies</h3>
-            <span class="session-step-subtitle">Building your emotional toolkit</span>
-          </div>
-          <div class="session-step-toggle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="session-step-body">
-          <div class="session-step-content">
-            <p>Learn techniques to manage stress, anxiety, and emotional challenges that you can apply in everyday life. Art-based coping strategies become tools you carry with you — practical, creative ways to navigate difficult moments.</p>
-            <div class="session-step-details">
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                <span>Practical techniques</span>
-              </div>
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                <span>Take-home exercises</span>
-              </div>
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg>
-                <span>Everyday application</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="session-step" data-step="5">
-        <div class="session-step-header">
-          <div class="session-step-num">5</div>
-          <div class="session-step-icon ssi-5">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/></svg>
-          </div>
-          <div class="session-step-title">
-            <h3>Progress &amp; Growth</h3>
-            <span class="session-step-subtitle">Witnessing your transformation</span>
-          </div>
-          <div class="session-step-toggle">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
-          </div>
-        </div>
-        <div class="session-step-body">
-          <div class="session-step-content">
-            <p>Notice positive changes in your well-being, self-awareness, and personal growth. Over time, the creative process reveals patterns of transformation — you'll feel empowered, confident, and more connected to yourself.</p>
-            <div class="session-step-details">
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83"/></svg>
-                <span>Measurable progress</span>
-              </div>
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                <span>Lasting empowerment</span>
-              </div>
-              <div class="ssd-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="16" height="16"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                <span>Ongoing support</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
   </div>
 </section>
 
@@ -790,7 +636,7 @@
 </footer>
 
 <!-- ═══════════════ BACK TO TOP ═══════════════ -->
-<button class="btt magnetic" aria-label="Back to top">
+<button class="btt" aria-label="Back to top">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 19V5m-7 7 7-7 7 7"/></svg>
 </button>
 
