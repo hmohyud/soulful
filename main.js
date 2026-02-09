@@ -25,20 +25,217 @@
     document.addEventListener('mouseout', e => { if(e.target.closest(sel)){dot.classList.remove('hovering');ring.classList.remove('hovering');} });
   }
 
-  /* ─── BG CANVAS ─── */
+  /* ─── BG CANVAS (organic watercolor blobs) ─── */
   const bgC = document.getElementById('bgCanvas');
   if (bgC) {
     const bc = bgC.getContext('2d'), pts = [];
-    const cols = ['rgba(163,196,160,.2)','rgba(198,123,92,.18)','rgba(155,122,158,.18)','rgba(212,160,160,.2)','rgba(201,169,110,.15)','rgba(155,122,158,.12)'];
+    const cols = [
+      ['rgba(163,196,160,.22)','rgba(163,196,160,.03)'],
+      ['rgba(198,123,92,.18)','rgba(198,123,92,.03)'],
+      ['rgba(155,122,158,.16)','rgba(155,122,158,.03)'],
+      ['rgba(212,160,160,.20)','rgba(212,160,160,.03)'],
+      ['rgba(163,196,160,.18)','rgba(163,196,160,.03)'],
+      ['rgba(198,123,92,.16)','rgba(198,123,92,.03)'],
+      ['rgba(155,122,158,.14)','rgba(155,122,158,.03)'],
+      ['rgba(212,160,160,.18)','rgba(212,160,160,.03)']
+    ];
     function rz() { bgC.width=innerWidth; bgC.height=innerHeight; }
     rz(); addEventListener('resize', rz);
-    for(let i=0;i<12;i++) pts.push({x:Math.random()*bgC.width,y:Math.random()*bgC.height,r:Math.random()*130+70,c:cols[i%cols.length],vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25});
-    let cv=true; new IntersectionObserver(e=>{cv=e[0].isIntersecting},{threshold:0}).observe(document.querySelector('.hero'));
-    let tk=0;
-    (function d(){requestAnimationFrame(d);if(!cv)return;if(++tk%2)return;bc.clearRect(0,0,bgC.width,bgC.height);
-      pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<-p.r)p.x=bgC.width+p.r;if(p.x>bgC.width+p.r)p.x=-p.r;if(p.y<-p.r)p.y=bgC.height+p.r;if(p.y>bgC.height+p.r)p.y=-p.r;
-        const g=bc.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);g.addColorStop(0,p.c);g.addColorStop(1,'transparent');bc.beginPath();bc.fillStyle=g;bc.arc(p.x,p.y,p.r,0,Math.PI*2);bc.fill();});
+
+    // Generate organic blob control points for each particle
+    function makeBlob(nPts) {
+      const angles = [];
+      for (let i = 0; i < nPts; i++) angles.push((i / nPts) * Math.PI * 2);
+      // Random radii per control point for organic shape
+      const radii = angles.map(() => 0.7 + Math.random() * 0.6);
+      return { angles, radii };
+    }
+
+    for (let i = 0; i < 8; i++) {
+      pts.push({
+        x: Math.random() * bgC.width,
+        y: Math.random() * bgC.height,
+        r: Math.random() * 120 + 80,
+        c: cols[i % cols.length],
+        vx: (Math.random() - .5) * .15,
+        vy: (Math.random() - .5) * .15,
+        blob: makeBlob(6 + Math.floor(Math.random() * 4)),
+        rot: Math.random() * Math.PI * 2,
+        rotV: (Math.random() - .5) * .003
+      });
+    }
+
+    let cv = true;
+    new IntersectionObserver(e => { cv = e[0].isIntersecting; }, { threshold: 0 }).observe(document.querySelector('.hero'));
+    let tk = 0;
+
+    function drawBlob(p) {
+      const { angles, radii } = p.blob;
+      const n = angles.length;
+      const points = [];
+      for (let i = 0; i < n; i++) {
+        const a = angles[i] + p.rot;
+        const r = p.r * radii[i];
+        points.push({ x: p.x + Math.cos(a) * r, y: p.y + Math.sin(a) * r });
+      }
+      // Smooth closed curve through points using quadratic bezier
+      bc.beginPath();
+      const first = points[0], last = points[n - 1];
+      bc.moveTo((last.x + first.x) / 2, (last.y + first.y) / 2);
+      for (let i = 0; i < n; i++) {
+        const curr = points[i];
+        const next = points[(i + 1) % n];
+        bc.quadraticCurveTo(curr.x, curr.y, (curr.x + next.x) / 2, (curr.y + next.y) / 2);
+      }
+      bc.closePath();
+
+      // Gradient fill
+      const g = bc.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 1.1);
+      g.addColorStop(0, p.c[0]);
+      g.addColorStop(0.6, p.c[0]);
+      g.addColorStop(1, p.c[1]);
+      bc.fillStyle = g;
+      bc.fill();
+    }
+
+    (function d() {
+      requestAnimationFrame(d);
+      if (!cv) return;
+      if (++tk % 2) return;
+      bc.clearRect(0, 0, bgC.width, bgC.height);
+      pts.forEach(p => {
+        p.x += p.vx; p.y += p.vy; p.rot += p.rotV;
+        if (p.x < -p.r) p.x = bgC.width + p.r;
+        if (p.x > bgC.width + p.r) p.x = -p.r;
+        if (p.y < -p.r) p.y = bgC.height + p.r;
+        if (p.y > bgC.height + p.r) p.y = -p.r;
+        drawBlob(p);
+      });
     })();
+  }
+
+  /* ─── STATIC ACRYLIC SPLAT OVERLAY ─── */
+  const splatC = document.getElementById('splatCanvas');
+  if (splatC) {
+    const sc = splatC.getContext('2d');
+    const dpr = devicePixelRatio || 1;
+
+    // Splat palette: dark forest greens + a few warm accents — MUCH more visible
+    const splatPalette = [
+      { color: 'rgba(25,55,35,1)', alpha: 0.28 },    // deep forest green
+      { color: 'rgba(35,70,45,1)', alpha: 0.24 },    // dark green
+      { color: 'rgba(45,80,50,1)', alpha: 0.20 },    // medium forest
+      { color: 'rgba(107,143,113,1)', alpha: 0.18 }, // sage accent
+      { color: 'rgba(155,122,158,1)', alpha: 0.16 }, // plum accent
+      { color: 'rgba(198,123,92,1)', alpha: 0.16 },  // terra accent
+    ];
+
+    // Store splat definitions with NORMALIZED coordinates (0-1 range)
+    // so they reposition correctly on resize
+    const pageH = document.documentElement.scrollHeight;
+    const splatCount = Math.floor(pageH / 400) * 3 + 4;
+    const splatDefs = [];
+
+    // Use a seeded random so splats stay consistent across redraws
+    let seed = 42;
+    function seededRandom() {
+      seed = (seed * 16807 + 0) % 2147483647;
+      return (seed - 1) / 2147483646;
+    }
+
+    for (let i = 0; i < splatCount; i++) {
+      splatDefs.push({
+        nx: seededRandom(),                          // normalized X (0-1)
+        ny: seededRandom(),                          // normalized Y (0-1)
+        size: 50 + seededRandom() * 120,             // slightly bigger splats
+        paletteIdx: i % splatPalette.length,
+        // Pre-generate the organic shape offsets so shape is consistent
+        nPts: 8 + Math.floor(seededRandom() * 6),
+        angles: [],
+        radii: [],
+        satellites: [],
+      });
+      const def = splatDefs[i];
+      for (let j = 0; j < def.nPts; j++) {
+        def.radii.push(0.5 + seededRandom() * 0.7);
+      }
+      const satCount = 3 + Math.floor(seededRandom() * 4);
+      for (let j = 0; j < satCount; j++) {
+        def.satellites.push({
+          angle: seededRandom() * Math.PI * 2,
+          dist: 1.0 + seededRandom() * 0.8,
+          r: 2 + seededRandom() * 5,
+          alphaScale: 0.4 + seededRandom() * 0.4,
+        });
+      }
+    }
+
+    // Draw a single splat at absolute coordinates
+    function drawSplat(x, y, size, color, alpha, def) {
+      const points = [];
+      for (let i = 0; i < def.nPts; i++) {
+        const a = (i / def.nPts) * Math.PI * 2;
+        const r = size * def.radii[i];
+        points.push({ x: x + Math.cos(a) * r, y: y + Math.sin(a) * r });
+      }
+
+      sc.save();
+      sc.globalAlpha = alpha;
+      sc.beginPath();
+      const last = points[def.nPts - 1], first = points[0];
+      sc.moveTo((last.x + first.x) / 2, (last.y + first.y) / 2);
+      for (let i = 0; i < def.nPts; i++) {
+        const curr = points[i];
+        const next = points[(i + 1) % def.nPts];
+        sc.quadraticCurveTo(curr.x, curr.y, (curr.x + next.x) / 2, (curr.y + next.y) / 2);
+      }
+      sc.closePath();
+
+      const g = sc.createRadialGradient(x, y, 0, x, y, size * 0.9);
+      g.addColorStop(0, color);
+      g.addColorStop(0.7, color);
+      g.addColorStop(1, 'transparent');
+      sc.fillStyle = g;
+      sc.fill();
+
+      // Satellite droplets
+      for (const sat of def.satellites) {
+        const dx = x + Math.cos(sat.angle) * size * sat.dist;
+        const dy = y + Math.sin(sat.angle) * size * sat.dist;
+        sc.beginPath();
+        sc.arc(dx, dy, sat.r, 0, Math.PI * 2);
+        sc.globalAlpha = alpha * sat.alphaScale;
+        sc.fillStyle = color;
+        sc.fill();
+      }
+      sc.restore();
+    }
+
+    // Render all splats at current viewport dimensions
+    function renderSplats() {
+      const W = innerWidth;
+      const H = document.documentElement.scrollHeight;
+      splatC.width = W * dpr;
+      splatC.height = H * dpr;
+      splatC.style.width = W + 'px';
+      splatC.style.height = H + 'px';
+      sc.setTransform(dpr, 0, 0, dpr, 0, 0);
+      sc.clearRect(0, 0, W, H);
+
+      for (const def of splatDefs) {
+        const p = splatPalette[def.paletteIdx];
+        drawSplat(def.nx * W, def.ny * H, def.size, p.color, p.alpha, def);
+      }
+    }
+
+    renderSplats();
+
+    // Re-render on resize so splats redistribute across the full width
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(renderSplats, 150);
+    });
   }
 
   /* ─── VANTA.JS BIRDS HERO BACKGROUND ─── */
@@ -75,7 +272,7 @@
   /* ─── NAV + BTT ─── */
   const nav=document.getElementById('mainNav'),btt=document.querySelector('.btt');
   const navTherapist=nav.querySelector('.nav-therapist');
-  const heroIntro=document.querySelector('.hero-intro');
+  const heroIntro=document.querySelector('.hero-logo');
   const heroEl=document.getElementById('hero');
   addEventListener('scroll',()=>{
     nav.classList.toggle('scrolled',scrollY>60);

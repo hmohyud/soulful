@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js"></script>
+<script src="vanta.birds.js"></script>
 </head>
 <body>
 
@@ -41,6 +41,8 @@
 
 <!-- ═══ BACKGROUND CANVAS ═══ -->
 <canvas id="bgCanvas"></canvas>
+<!-- ═══ STATIC ACRYLIC SPLAT OVERLAY ═══ -->
+<canvas id="splatCanvas"></canvas>
 
 <!-- ═══ LIGHTBOX ═══ -->
 <div class="lightbox" id="lightbox">
@@ -53,13 +55,7 @@
 <!-- ═══════════════ NAVIGATION ═══════════════ -->
 <nav class="nav" id="mainNav">
   <a href="#" class="nav-logo">
-    <svg class="nav-butterfly" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M32 16C24 4 8 2 4 14s8 22 28 18" fill="#9b7a9e" opacity=".7"/>
-      <path d="M32 16C40 4 56 2 60 14s-8 22-28 18" fill="#c67b5c" opacity=".7"/>
-      <path d="M32 34C24 42 10 52 8 44s10-18 24-10" fill="#a3c4a0" opacity=".6"/>
-      <path d="M32 34C40 42 54 52 56 44s-10-18-24-10" fill="#d4a0a0" opacity=".6"/>
-      <ellipse cx="32" cy="32" rx="2" ry="16" fill="#1a2f2a"/>
-    </svg>
+    <img class="nav-logo-img" src="public/44fea207-85d1-4c5d-b987-77630315d479_removalai_preview.png" alt="Soulful Expressions">
     <span class="nav-logo-text">Soulful Expressions</span>
   </a>
   <div class="nav-links">
@@ -99,13 +95,8 @@
   <div class="hero-vanta" id="heroVanta"></div>
 
   <div class="hero-content">
-    <div class="hero-intro">
-      <span class="hero-intro-name">Fatema Qutbuddin</span>
-      <div class="hero-portrait">
-        <img src="public/mo5b3BibYc9I.png" alt="Fatema Qutbuddin — Art Therapist" loading="eager">
-        <div class="hero-portrait-ring"></div>
-      </div>
-      <span class="hero-intro-role">Art Therapist</span>
+    <div class="hero-logo">
+      <img src="public/44fea207-85d1-4c5d-b987-77630315d479_removalai_preview.png" alt="Soulful Expressions" loading="eager">
     </div>
     <h1>Experience the<br>Transformative Power of<br><em>Art Therapy</em></h1>
     <p class="hero-sub">Explore your emotions, process challenges, and foster personal growth in a safe and supportive environment.</p>
@@ -125,8 +116,6 @@
     <div class="hero-scroll-line"></div>
   </div>
 </section>
-
-
 
 <!-- ═══════════════ BENEFITS ═══════════════ -->
 <section class="benefits" id="benefits">
@@ -468,15 +457,6 @@
   <canvas id="bloomCanvas" class="bloom-canvas"></canvas>
 
   <div class="mission-inner" data-reveal="scale">
-    <div class="mission-icon">
-      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M32 16C24 4 8 2 4 14s8 22 28 18" fill="#9b7a9e" opacity=".6"/>
-        <path d="M32 16C40 4 56 2 60 14s-8 22-28 18" fill="#c67b5c" opacity=".6"/>
-        <path d="M32 34C24 42 10 52 8 44s10-18 24-10" fill="#a3c4a0" opacity=".5"/>
-        <path d="M32 34C40 42 54 52 56 44s-10-18-24-10" fill="#d4a0a0" opacity=".5"/>
-        <ellipse cx="32" cy="32" rx="2" ry="16" fill="#1a2f2a"/>
-      </svg>
-    </div>
     <span class="section-tag">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       Our Mission
