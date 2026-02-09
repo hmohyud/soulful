@@ -55,7 +55,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .loader-butterfly{width:80px;height:80px;animation:loaderSpin 2s var(--ease) infinite}
 .loader-butterfly svg{width:100%;height:100%}
 .loader-bar{width:200px;height:3px;background:rgba(255,255,255,.1);border-radius:99px;overflow:hidden}
-.loader-fill{height:100%;background:linear-gradient(90deg,var(--sage-light),var(--terra),var(--plum-light),var(--rose));width:0;
+.loader-fill{height:100%;background:linear-gradient(90deg,#6B3FA0,#A0334D);width:0;
   border-radius:99px;transition:width .3s}
 .loader-text{color:rgba(255,255,255,.4);font-size:.75rem;letter-spacing:.15em;text-transform:uppercase}
 @keyframes loaderSpin{0%{transform:rotate(0) scale(1)}50%{transform:rotate(180deg) scale(.9)}100%{transform:rotate(360deg) scale(1)}}
@@ -106,7 +106,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .nav-links a:hover{color:var(--terra)}
 .nav-links a:hover::after{width:100%}
 .nav-cta-btn{background:var(--deep);color:var(--cream)!important;
-  padding:.55rem 1.6rem;border-radius:100px;font-size:.75rem;font-weight:600;
+  padding:.55rem .6rem!important;border-radius:100px;font-size:.75rem;font-weight:600;
   letter-spacing:.06em;text-transform:uppercase;transition:all .5s var(--ease);
   border:2px solid var(--deep);position:relative;overflow:hidden}
 .nav-cta-btn::before{content:'';position:absolute;inset:0;background:var(--terra);
@@ -118,13 +118,13 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 
 /* Nav therapist badge */
 .nav-therapist{display:flex;align-items:center;gap:.65rem;padding:.35rem .8rem .35rem .35rem;
-  border-radius:100px;border:1px solid var(--border);transition:all .4s var(--ease);
+  border-radius:100px;border:1px solid var(--border);transition:background .4s var(--ease),border-color .4s var(--ease),box-shadow .4s var(--ease),backdrop-filter .4s var(--ease);
   background:rgba(255,255,255,.5);backdrop-filter:blur(8px);margin-left:.5rem;
   cursor:pointer;font:inherit;opacity:1;pointer-events:auto}
 .nav-therapist:hover{border-color:var(--sage-light);background:rgba(255,255,255,.8);
-  transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,.05)}
+  box-shadow:0 4px 16px rgba(0,0,0,.05)}
 .nav-therapist img{width:34px;height:34px;border-radius:50%;object-fit:cover;
-  border:2px solid var(--sage-light);flex-shrink:0}
+  border:2px solid var(--sage-light);flex-shrink:0;transition:none}
 .nav-therapist-info{display:flex;flex-direction:column;line-height:1.2}
 .nav-therapist-name{font-size:.72rem;font-weight:600;color:var(--deep);white-space:nowrap}
 .nav-therapist-role{font-size:.6rem;color:var(--sage);font-weight:500;letter-spacing:.04em;

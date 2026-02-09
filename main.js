@@ -274,9 +274,54 @@
 
   /* ─── NAV + BTT ─── */
   const nav=document.getElementById('mainNav'),btt=document.querySelector('.btt');
+  const navTherapist=nav.querySelector('.nav-therapist');
+  const therapistImg=navTherapist?navTherapist.querySelector('img'):null;
+
+  // Therapist photo: large at top-right, shrinks into nav pill on scroll (wide only)
+  const navRect=()=>nav.getBoundingClientRect();
+  function updateTherapistSize(){
+    if(!therapistImg||!navTherapist) return;
+    const wide=window.innerWidth>1260;
+    if(!wide){
+      therapistImg.style.cssText='';
+      navTherapist.style.cssText='';
+      navTherapist.classList.remove('therapist-hero');
+      return;
+    }
+    const trigger=80;
+    const t=Math.min(1,scrollY/trigger); // 0=top, 1=scrolled
+    // Scale max size by viewport: 260px at 1600+, down to 90px at 1260px
+    const vw=window.innerWidth;
+    const maxSize=Math.round(90+Math.min(1,(vw-1260)/340)*170); // 90→260
+    const size=Math.round(maxSize-t*(maxSize-34)); // maxSize → 34px
+
+    if(t<1){
+      navTherapist.classList.add('therapist-hero');
+      // Get the pill's resting position for the endpoint
+      const nr=navRect();
+      const endRight=16;
+      const endTop=Math.round((nr.height-34)/2);
+      // Large: top-right of viewport, outside nav flow
+      const startRight=16;
+      const startTop=16;
+      const right=startRight+t*(endRight-startRight);
+      const top=startTop+t*(endTop-startTop);
+      therapistImg.style.cssText='width:'+size+'px;height:'+size+'px;position:fixed;top:'+top+'px;right:'+right+'px;z-index:9001;border-radius:50%;object-fit:cover;border:3px solid var(--sage-light);box-shadow:0 4px 20px rgba(0,0,0,.1);';
+      // Hide the nav button container so it doesn't take space
+      navTherapist.style.cssText='width:0;height:0;padding:0;border:none;background:none;backdrop-filter:none;overflow:hidden;margin:0;';
+    } else {
+      navTherapist.classList.remove('therapist-hero');
+      therapistImg.style.cssText='';
+      navTherapist.style.cssText='';
+    }
+  }
+  updateTherapistSize();
+  addEventListener('resize',updateTherapistSize);
+
   addEventListener('scroll',()=>{
     nav.classList.toggle('scrolled',scrollY>60);
     btt.classList.toggle('show',scrollY>600);
+    updateTherapistSize();
     up();
   },{passive:true});
   btt.addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
