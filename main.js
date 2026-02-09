@@ -353,79 +353,155 @@
 
 
   /* ═══════════════════════════════════════════════════════════════
-     ★ BLOOM — Interactive flower/mandala (Mission section)
+     ★ WATERCOLOR — Ink drops on hover + splatter on click (Mission)
      ═══════════════════════════════════════════════════════════════ */
   (() => {
     const canvas = document.getElementById('bloomCanvas');
     if (!canvas) return;
     const bc = canvas.getContext('2d');
-    let W, H, mx = 0.5, my = 0.5, vis = false;
-    const colors = ['#a3c4a0', '#c67b5c', '#9b7a9e', '#d4a0a0', '#c9a96e', '#9b7a9e'];
+    let W, H, vis = false, tick = 0;
+    const MAX_DROPS = 25, MAX_SPLATS = 6;
+    const PAL = [
+      {r:107,g:63,b:160},  {r:160,g:51,b:77},
+      {r:155,g:122,b:158}, {r:212,g:160,b:160}, {r:163,g:196,b:160}
+    ];
+    function rgba(c,a){return 'rgba('+c.r+','+c.g+','+c.b+','+a+')';}
+    function pick(){return PAL[Math.floor(Math.random()*PAL.length)];}
 
-    function rz() {
-      const r = canvas.parentElement.getBoundingClientRect(), d = devicePixelRatio || 1;
-      canvas.width = r.width * d; canvas.height = r.height * d;
-      W = r.width; H = r.height;
-      bc.setTransform(d, 0, 0, d, 0, 0);
+    function rz(){
+      const r=canvas.parentElement.getBoundingClientRect(), d=devicePixelRatio||1;
+      canvas.width=r.width*d; canvas.height=r.height*d;
+      W=r.width; H=r.height; bc.setTransform(d,0,0,d,0,0);
     }
-    rz(); addEventListener('resize', rz);
+    rz(); addEventListener('resize',rz);
+    new IntersectionObserver(e=>{vis=e[0].isIntersecting;},{threshold:0.05}).observe(canvas);
 
-    new IntersectionObserver(e => { vis = e[0].isIntersecting; }, { threshold: 0.05 }).observe(canvas);
-
-    const mEl = document.getElementById('mission');
-    mEl.addEventListener('mousemove', e => { const r = mEl.getBoundingClientRect(); mx = (e.clientX - r.left) / r.width; my = (e.clientY - r.top) / r.height; });
-    mEl.addEventListener('touchmove', e => { const r = mEl.getBoundingClientRect(), t = e.touches[0]; mx = (t.clientX - r.left) / r.width; my = (t.clientY - r.top) / r.height; }, { passive: true });
-
-    let tick = 0;
-    function draw() {
-      requestAnimationFrame(draw);
-      if (!vis) return;
-      if (++tick % 2) return;
-
-      bc.clearRect(0, 0, W, H);
-      const cx = W / 2, cy = H / 2;
-      const time = Date.now() * 0.0003;
-      const petalCount = 12;
-      const layers = 4;
-
-      for (let layer = 0; layer < layers; layer++) {
-        const layerRatio = layer / layers;
-        const maxR = Math.min(W, H) * (0.15 + mx * 0.25) * (0.4 + layerRatio * 0.6);
-        const rotOffset = time * (1 + layer * 0.3) + my * Math.PI;
-
-        for (let i = 0; i < petalCount; i++) {
-          const angle = (i / petalCount) * Math.PI * 2 + rotOffset;
-          const petalLen = maxR * (0.6 + 0.4 * Math.sin(time * 2 + i + layer));
-          const petalW = maxR * 0.18 * (0.5 + my * 0.5);
-
-          const px = cx + Math.cos(angle) * petalLen * 0.4;
-          const py = cy + Math.sin(angle) * petalLen * 0.4;
-
-          bc.save();
-          bc.translate(px, py);
-          bc.rotate(angle);
-
-          bc.beginPath();
-          bc.moveTo(0, 0);
-          bc.quadraticCurveTo(petalW, -petalLen * 0.3, 0, -petalLen * 0.7);
-          bc.quadraticCurveTo(-petalW, -petalLen * 0.3, 0, 0);
-          bc.closePath();
-
-          const col = colors[(i + layer) % colors.length];
-          bc.fillStyle = col;
-          bc.globalAlpha = 0.06 + layerRatio * 0.04;
-          bc.fill();
-
-          bc.restore();
+    /* — shared organic blob path — */
+    function blobPath(cx,cy,r,offsets){
+      const n=offsets.length;
+      bc.beginPath();
+      for(let j=0;j<=n;j++){
+        const a=(j/n)*Math.PI*2;
+        const off=offsets[j%n];
+        const px=cx+Math.cos(a)*r*off, py=cy+Math.sin(a)*r*off;
+        if(j===0){bc.moveTo(px,py);}
+        else{
+          const pa=((j-0.5)/n)*Math.PI*2;
+          const co=(offsets[j%n]+offsets[(j-1+n)%n])*0.5;
+          bc.quadraticCurveTo(cx+Math.cos(pa)*r*co, cy+Math.sin(pa)*r*co, px, py);
         }
       }
+      bc.closePath();
+    }
 
-      const gr = bc.createRadialGradient(cx, cy, 0, cx, cy, 40 + mx * 30);
-      gr.addColorStop(0, 'rgba(198,123,92,0.08)');
-      gr.addColorStop(1, 'rgba(198,123,92,0)');
-      bc.globalAlpha = 1;
-      bc.fillStyle = gr;
-      bc.beginPath(); bc.arc(cx, cy, 60 + mx * 30, 0, Math.PI * 2); bc.fill();
+    /* — ink drops (hover) — */
+    const drops=[];
+    let lastX=-1, lastY=-1;
+    const DROP_FADE=0.006; // ~2.5s fade
+
+    const mEl=document.getElementById('mission');
+    mEl.addEventListener('mousemove',e=>{
+      const r=mEl.getBoundingClientRect();
+      const x=e.clientX-r.left, y=e.clientY-r.top;
+      const dx=x-lastX, dy=y-lastY;
+      if(Math.sqrt(dx*dx+dy*dy)>50||lastX<0){
+        if(drops.length>=MAX_DROPS) drops.shift();
+        drops.push({x,y,c:pick(),maxR:30+Math.random()*50,life:1,
+          speed:0.3+Math.random()*0.3,
+          offsets:Array.from({length:6},()=>0.7+Math.random()*0.6)});
+        lastX=x; lastY=y;
+      }
+    });
+    mEl.addEventListener('mouseleave',()=>{lastX=-1;lastY=-1;});
+
+    /* — splatters (click) — ~6s fade — */
+    const splatters=[];
+    const SPLAT_FADE=1/(6*30); // ~6s at 30fps (we skip frames)
+
+    canvas.addEventListener('click',e=>{
+      const r=canvas.getBoundingClientRect();
+      const x=e.clientX-r.left, y=e.clientY-r.top;
+      const c=pick();
+      const blobs=[];
+      // central blob
+      blobs.push({x,y,r:30+Math.random()*35,
+        offsets:Array.from({length:6},()=>0.6+Math.random()*0.8),drip:null});
+      // satellite droplets — fewer for perf
+      const count=5+Math.floor(Math.random()*5);
+      for(let i=0;i<count;i++){
+        const a=Math.random()*Math.PI*2, dist=35+Math.random()*90;
+        blobs.push({
+          x:x+Math.cos(a)*dist, y:y+Math.sin(a)*dist,
+          r:5+Math.random()*14,
+          offsets:Array.from({length:5},()=>0.6+Math.random()*0.8),
+          drip:Math.random()>0.5?{len:12+Math.random()*35,
+            angle:Math.PI/2+Math.random()*0.4-0.2}:null
+        });
+      }
+      if(splatters.length>=MAX_SPLATS) splatters.shift();
+      splatters.push({blobs,color:c,life:1});
+    });
+
+    /* — draw loop (throttled to ~30fps) — */
+    function draw(){
+      requestAnimationFrame(draw);
+      if(!vis) return;
+      if(++tick%2) return; // skip every other frame → 30fps
+      bc.clearRect(0,0,W,H);
+
+      /* draw ink drops — single fill pass, no blur filter */
+      for(let i=drops.length-1;i>=0;i--){
+        const d=drops[i];
+        d.life-=DROP_FADE*d.speed;
+        if(d.life<=0){drops.splice(i,1);continue;}
+        const expand=1+(1-d.life)*1.2;
+        const cr=d.maxR*expand;
+
+        bc.save();
+        bc.globalAlpha=d.life*0.35;
+        blobPath(d.x,d.y,cr,d.offsets);
+        bc.fillStyle=rgba(d.c,0.7);
+        bc.fill();
+        // lighter halo — just a bigger fill, no blur filter
+        bc.globalAlpha=d.life*0.15;
+        blobPath(d.x,d.y,cr*1.4,d.offsets);
+        bc.fillStyle=rgba(d.c,0.3);
+        bc.fill();
+        bc.restore();
+      }
+
+      /* draw splatters — single pass, no blur filter */
+      for(let i=splatters.length-1;i>=0;i--){
+        const s=splatters[i];
+        s.life-=SPLAT_FADE;
+        if(s.life<=0){splatters.splice(i,1);continue;}
+
+        bc.save();
+        for(const b of s.blobs){
+          bc.globalAlpha=s.life*0.5;
+          blobPath(b.x,b.y,b.r,b.offsets);
+          bc.fillStyle=rgba(s.color,0.7);
+          bc.fill();
+          // halo
+          bc.globalAlpha=s.life*0.2;
+          blobPath(b.x,b.y,b.r*1.3,b.offsets);
+          bc.fillStyle=rgba(s.color,0.3);
+          bc.fill();
+          // drip
+          if(b.drip){
+            const ex=b.x+Math.cos(b.drip.angle)*b.drip.len;
+            const ey=b.y+Math.sin(b.drip.angle)*b.drip.len;
+            bc.beginPath();
+            bc.moveTo(b.x-3,b.y);
+            bc.quadraticCurveTo(b.x,b.y+b.drip.len*0.5,ex,ey);
+            bc.quadraticCurveTo(b.x,b.y+b.drip.len*0.5,b.x+3,b.y);
+            bc.fillStyle=rgba(s.color,0.5);
+            bc.globalAlpha=s.life*0.35;
+            bc.fill();
+          }
+        }
+        bc.restore();
+      }
     }
     draw();
   })();
