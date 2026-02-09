@@ -955,6 +955,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   .btt svg{width:16px;height:16px}
   .cursor-dot,.cursor-ring{display:none!important}
 }
+/* Hide custom cursor on any touch-primary device (tablets, phones in landscape, etc.) */
+@media(pointer:coarse){.cursor-dot,.cursor-ring{display:none!important}}
 @media(max-width:480px){
   .nav{padding:.8rem 1rem}
   .nav.scrolled{padding:.5rem 1rem}
