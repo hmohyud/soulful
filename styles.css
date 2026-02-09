@@ -253,9 +253,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .hero::before{content:'';position:absolute;bottom:0;left:0;right:0;height:200px;
   background:linear-gradient(to top,var(--cream),transparent);z-index:1;pointer-events:none}
 .hero::after{content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse at 20% 80%,rgba(163,196,160,.14),transparent 50%),
-    radial-gradient(ellipse at 80% 20%,rgba(198,123,92,.10),transparent 50%),
-    radial-gradient(ellipse at 50% 100%,rgba(155,122,158,.08),transparent 40%);
+  background:radial-gradient(ellipse at 20% 80%,rgba(107,63,160,.12),transparent 50%),
+    radial-gradient(ellipse at 80% 20%,rgba(160,51,77,.10),transparent 50%),
+    radial-gradient(ellipse at 50% 100%,rgba(155,122,158,.10),transparent 40%);
   z-index:1;pointer-events:none}
 .hero-vanta{position:absolute;inset:0;z-index:0}
 
@@ -264,16 +264,17 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .hero-logo{margin-bottom:2rem;animation:heroFade 1s .1s both;position:relative}
 .hero-logo::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
   width:140%;height:140%;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(155,122,158,.08),rgba(198,123,92,.05) 40%,transparent 70%);
+  background:radial-gradient(ellipse,rgba(107,63,160,.10),rgba(160,51,77,.06) 40%,transparent 70%);
   filter:blur(20px);z-index:-1;pointer-events:none}
 .hero-logo img{width:clamp(180px,22vw,260px);height:auto;
-  filter:drop-shadow(0 8px 30px rgba(155,122,158,.18)) drop-shadow(0 2px 8px rgba(198,123,92,.1))}
+  filter:drop-shadow(0 8px 30px rgba(107,63,160,.18)) drop-shadow(0 2px 8px rgba(160,51,77,.12))}
 .hero h1{font-family:var(--f-display);font-size:clamp(2.6rem,6.5vw,5.2rem);
   font-weight:300;line-height:1.08;color:var(--deep);margin-bottom:1.2rem;
   animation:heroFade 1s .4s both}
-.hero h1 em{font-style:italic;color:var(--terra);display:inline-block;position:relative}
+.hero h1 em{font-style:italic;color:#4a2d5e;display:inline-block;position:relative;
+  text-shadow:1.5px .5px 0 #A0334D}
 .hero h1 em::after{content:'';position:absolute;bottom:.08em;left:-.02em;right:-.02em;
-  height:.18em;background:var(--terra-faint);transform:skewX(-4deg);border-radius:2px}
+  height:.18em;background:var(--plum-faint);transform:skewX(-4deg);border-radius:2px}
 .hero-sub{font-size:clamp(1rem,1.8vw,1.15rem);color:var(--gray);max-width:580px;
   margin:0 auto 2rem;line-height:1.85;animation:heroFade 1s .6s both;font-weight:300}
 .hero-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;animation:heroFade 1s .8s both}
@@ -286,10 +287,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .btn svg{width:16px;height:16px;transition:transform .3s var(--ease)}
 .btn:hover svg{transform:translateX(3px)}
 .btn-fill{background:var(--deep);color:var(--cream);border:2px solid var(--deep)}
-.btn-fill::before{content:'';position:absolute;inset:0;background:var(--terra);
+.btn-fill::before{content:'';position:absolute;inset:0;background:var(--plum);
   transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease)}
 .btn-fill:hover::before{transform:scaleX(1);transform-origin:left}
-.btn-fill:hover{border-color:var(--terra);box-shadow:0 8px 30px rgba(198,123,92,.2)}
+.btn-fill:hover{border-color:var(--plum);box-shadow:0 8px 30px rgba(107,76,110,.2)}
 .btn-fill>*{position:relative;z-index:1}
 .btn-outline{background:transparent;color:var(--deep);border:2px solid var(--deep)}
 .btn-outline:hover{background:var(--deep);color:var(--cream);box-shadow:0 8px 30px rgba(26,47,42,.15)}
@@ -300,7 +301,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .hero-scroll-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.18em;color:var(--gray-light)}
 .hero-scroll-line{width:1px;height:44px;background:rgba(0,0,0,.1);position:relative;overflow:hidden}
 .hero-scroll-line::after{content:'';position:absolute;top:-100%;left:0;width:100%;height:40%;
-  background:var(--terra);animation:scrollPulse 2.2s ease-in-out infinite}
+  background:var(--plum);animation:scrollPulse 2.2s ease-in-out infinite}
 @keyframes scrollPulse{0%{top:-100%}100%{top:200%}}
 
 
