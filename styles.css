@@ -899,10 +899,25 @@ button {
   pointer-events: none
 }
 
-.hero-logo img {
+.hero-logo img:not(.hero-swirl) {
   width: clamp(180px, 22vw, 260px);
   height: auto;
-  filter: drop-shadow(0 8px 30px rgba(107, 63, 160, .18)) drop-shadow(0 2px 8px rgba(160, 51, 77, .12))
+  filter: drop-shadow(0 8px 30px rgba(107, 63, 160, .18)) drop-shadow(0 2px 8px rgba(160, 51, 77, .12));
+  position: relative;
+  z-index: 1
+}
+
+.hero-swirl {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 160%;
+  height: auto;
+  opacity: .45;
+  pointer-events: none;
+  z-index: 0;
+  filter: none !important
 }
 
 .hero h1 {
@@ -4036,7 +4051,7 @@ button {
     padding: 4.5rem 1.5rem 5.5rem
   }
 
-  .hero-logo img {
+  .hero-logo img:not(.hero-swirl) {
     width: 180px
   }
 
@@ -4174,7 +4189,7 @@ button {
     margin-top: 1rem
   }
 
-  .hero-logo img {
+  .hero-logo img:not(.hero-swirl) {
     width: 150px
   }
 
