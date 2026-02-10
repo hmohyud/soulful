@@ -3374,7 +3374,7 @@ button {
   margin: 0 auto;
   display: flex;
   gap: 4.5rem;
-  align-items: flex-start;
+  align-items: center;
   position: relative;
   z-index: 1
 }
@@ -3443,45 +3443,29 @@ button {
   font-weight: 600
 }
 
-/* Therapist timeline */
-.therapist-timeline {
-  position: relative;
-  padding-left: 2rem;
-  margin: 2rem 0;
-  border-left: 2px solid rgba(155, 122, 158, .2)
+/* Therapist milestones — compact list */
+.therapist-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+  margin: 1.5rem 0
 }
 
-.tl-item {
-  position: relative;
-  padding: .6rem 0 .6rem 1rem
+.milestone {
+  font-size: .82rem;
+  color: rgba(255, 255, 255, .55);
+  line-height: 1.5;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(155, 122, 158, .25)
 }
 
-.tl-dot {
-  position: absolute;
-  left: -2.35rem;
-  top: .85rem;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(163, 196, 160, .4);
-  border: 2px solid var(--sage-light)
-}
-
-.tl-item::before {
-  content: attr(data-year);
+.milestone-label {
   font-size: .6rem;
   text-transform: uppercase;
   letter-spacing: .1em;
   color: var(--sage-light);
   font-weight: 600;
-  display: block;
-  margin-bottom: .1rem
-}
-
-.tl-content {
-  font-size: .82rem;
-  color: rgba(255, 255, 255, .55);
-  line-height: 1.5
+  margin-right: .4rem
 }
 
 .credentials {
@@ -3541,19 +3525,6 @@ button {
     margin-bottom: 1rem
   }
 
-  .therapist-timeline {
-    padding-left: 1.5rem;
-    margin: 1.5rem 0
-  }
-
-  .tl-item {
-    padding: .5rem 0 .5rem .8rem
-  }
-
-  .tl-content {
-    font-size: .78rem
-  }
-
   .credentials {
     gap: .4rem;
     margin-top: 1.5rem
@@ -3596,26 +3567,6 @@ button {
     font-size: .82rem;
     line-height: 1.7;
     margin-bottom: .8rem
-  }
-
-  .therapist-timeline {
-    padding-left: 1.2rem;
-    margin: 1.2rem 0
-  }
-
-  .tl-dot {
-    left: -1.85rem;
-    width: 8px;
-    height: 8px
-  }
-
-  .tl-item::before {
-    font-size: .55rem
-  }
-
-  .tl-content {
-    font-size: .75rem;
-    line-height: 1.45
   }
 
   .credentials {
