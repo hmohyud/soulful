@@ -247,10 +247,15 @@
     renderSplats();
 
     // Re-render on resize so splats redistribute across the full width
-    let resizeTimer;
+    let resizeTimer, resizeTimer2;
     window.addEventListener('resize', () => {
+      // Immediately collapse canvas so it doesn't hold the page open during reflow
+      splatC.style.height = '0px';
       clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(renderSplats, 150);
+      clearTimeout(resizeTimer2);
+      resizeTimer = setTimeout(renderSplats, 200);
+      // Second pass catches any late reflow changes
+      resizeTimer2 = setTimeout(renderSplats, 600);
     });
   }
 
