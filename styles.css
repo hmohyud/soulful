@@ -1702,12 +1702,18 @@ button {
   padding: var(--s9) 2rem;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(107, 63, 160, .06) 0%, rgba(155, 122, 158, .10) 40%, rgba(155, 122, 158, .10) 60%, rgba(107, 63, 160, .06) 100%)
+  background:
+    radial-gradient(ellipse at 20% 80%, rgba(107, 63, 160, .18), transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(160, 51, 77, .14), transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(155, 122, 158, .16), transparent 40%),
+    linear-gradient(180deg, #ede4f0 0%, #ddd0e4 50%, #ede4f0 100%)
 }
 
 .testimonials-inner {
   max-width: 1200px;
-  margin: 0 auto
+  margin: 0 auto;
+  position: relative;
+  z-index: 2
 }
 
 .testimonials-header {
