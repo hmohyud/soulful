@@ -3750,6 +3750,68 @@ button {
   color: var(--terra)
 }
 
+/* Social links row */
+.contact-socials {
+  text-align: center;
+  margin-top: 2.5rem
+}
+
+.contact-socials-label {
+  display: block;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-weight: 600;
+  color: var(--gray-light);
+  margin-bottom: 1rem
+}
+
+.contact-socials-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem
+}
+
+.contact-social-link {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .7rem 1.4rem;
+  border-radius: 100px;
+  font-size: .82rem;
+  font-weight: 500;
+  color: white;
+  text-decoration: none;
+  transition: all .3s var(--ease)
+}
+
+.contact-social-link svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0
+}
+
+.contact-social-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.15)
+}
+
+.cs-linkedin {
+  background: #0A66C2
+}
+
+.cs-linkedin:hover {
+  background: #004182
+}
+
+.cs-instagram {
+  background: linear-gradient(135deg, #833AB4, #E1306C, #F77737)
+}
+
+.cs-instagram:hover {
+  background: linear-gradient(135deg, #6C2D99, #C4275B, #D4652E)
+}
+
 /* Copy button */
 .copy-btn {
   display: inline-flex;
@@ -3905,6 +3967,43 @@ button {
 
 .footer a:hover {
   color: var(--cream)
+}
+
+.footer-socials {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.2rem
+}
+
+.footer-socials a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  transition: all .3s var(--ease)
+}
+
+.footer-socials a:hover {
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.25);
+  transform: translateY(-2px)
+}
+
+.footer-socials img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  opacity: .7;
+  transition: opacity .3s
+}
+
+.footer-socials a:hover img {
+  opacity: 1
 }
 
 /* ════════════════ BACK TO TOP ════════════════ */

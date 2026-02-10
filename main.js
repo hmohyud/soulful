@@ -215,6 +215,8 @@
     const testimonialsEl = document.getElementById('testimonials');
     function renderSplats() {
       const W = innerWidth;
+      // Collapse canvas before measuring so it doesn't inflate scrollHeight
+      splatC.style.height = '0px';
       const H = document.documentElement.scrollHeight;
       splatC.width = W * dpr;
       splatC.height = H * dpr;
