@@ -922,9 +922,9 @@ button {
 
 .hero h1 {
   font-family: var(--f-display);
-  font-size: clamp(2.6rem, 6.5vw, 4.2rem);
+  font-size: clamp(2.2rem, 5.5vw, 3.5rem);
   font-weight: 300;
-  line-height: 1.08;
+  line-height: 1.12;
   color: var(--deep);
   margin-bottom: 1.2rem;
   animation: heroFade 1s .4s both
@@ -935,7 +935,8 @@ button {
   color: #4a2d5e;
   display: inline-block;
   position: relative;
-  text-shadow: 1.5px .5px 0 #A0334D
+  text-shadow: 1.5px .5px 0 #A0334D;
+  font-size: clamp(3.2rem, 7.5vw, 5rem)
 }
 
 .hero h1 em::after {
