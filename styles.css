@@ -693,8 +693,6 @@ button {
 /* ── Watercolor wash system — soft color bleeds at section boundaries ── */
 .benefits::before,
 .benefits::after,
-.testimonials::before,
-.testimonials::after,
 .sessions::before,
 .sessions::after,
 .mission::before,
@@ -727,23 +725,6 @@ button {
   bottom: -60px;
   left: -40px;
   background: radial-gradient(ellipse, var(--wash-rose), transparent 70%)
-}
-
-/* Testimonials — plum/terra washes */
-.testimonials::before {
-  width: 500px;
-  height: 350px;
-  top: -100px;
-  left: -80px;
-  background: radial-gradient(ellipse, var(--wash-plum), transparent 70%)
-}
-
-.testimonials::after {
-  width: 400px;
-  height: 300px;
-  bottom: -80px;
-  right: -60px;
-  background: radial-gradient(ellipse, var(--wash-terra), transparent 70%)
 }
 
 /* Sessions — terra/gold washes */
@@ -1721,7 +1702,7 @@ button {
   padding: var(--s9) 2rem;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, var(--cream) 0%, rgba(155, 122, 158, .09) 30%, rgba(198, 123, 92, .06) 60%, var(--cream-dark) 100%)
+  background: linear-gradient(180deg, rgba(107, 63, 160, .06) 0%, rgba(155, 122, 158, .10) 40%, rgba(155, 122, 158, .10) 60%, rgba(107, 63, 160, .06) 100%)
 }
 
 .testimonials-inner {

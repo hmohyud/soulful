@@ -212,6 +212,7 @@
     }
 
     // Render all splats at current viewport dimensions
+    const testimonialsEl = document.getElementById('testimonials');
     function renderSplats() {
       const W = innerWidth;
       const H = document.documentElement.scrollHeight;
@@ -222,9 +223,22 @@
       sc.setTransform(dpr, 0, 0, dpr, 0, 0);
       sc.clearRect(0, 0, W, H);
 
+      // Get testimonials bounds to skip splats in that region
+      let tTop = -1, tBot = -1;
+      if (testimonialsEl) {
+        const tr = testimonialsEl.getBoundingClientRect();
+        tTop = tr.top + scrollY;
+        tBot = tr.bottom + scrollY;
+      }
+
       for (const def of splatDefs) {
+        const y = def.ny * H;
+        // Skip splats that land inside or near the testimonials section
+        // Use 2x size buffer to account for satellite droplets
+        const buf = def.size * 2;
+        if (tTop >= 0 && y + buf > tTop && y - buf < tBot) continue;
         const p = splatPalette[def.paletteIdx];
-        drawSplat(def.nx * W, def.ny * H, def.size, p.color, p.alpha, def);
+        drawSplat(def.nx * W, y, def.size, p.color, p.alpha, def);
       }
     }
 
