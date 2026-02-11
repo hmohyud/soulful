@@ -182,7 +182,7 @@ button {
   pointer-events: none;
   z-index: 99999;
   mix-blend-mode: difference;
-  transition: width .25s var(--ease), height .25s var(--ease), background .25s
+  transition: width .25s var(--ease), height .25s var(--ease), background .25s, opacity .3s ease
 }
 
 .cursor-ring {
@@ -194,7 +194,7 @@ button {
   pointer-events: none;
   z-index: 99999;
   mix-blend-mode: difference;
-  transition: width .4s var(--ease), height .4s var(--ease), border-color .3s
+  transition: width .4s var(--ease), height .4s var(--ease), border-color .3s, opacity .3s ease
 }
 
 .cursor-dot.hovering {
@@ -3056,7 +3056,10 @@ button {
   padding: var(--s9) 2rem;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, var(--cream-dark) 0%, rgba(163, 196, 160, .09) 25%, rgba(155, 122, 158, .07) 60%, var(--cream) 100%)
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(107, 63, 160, .15), transparent 55%),
+    radial-gradient(ellipse at 75% 80%, rgba(155, 122, 158, .12), transparent 50%),
+    linear-gradient(180deg, #1a1a2e 0%, #16132b 40%, #1a1a2e 100%)
 }
 
 .mission-inner {
@@ -3077,14 +3080,14 @@ button {
   font-family: var(--f-display);
   font-size: clamp(1.2rem, 2.2vw, 1.5rem);
   line-height: 1.95;
-  color: var(--charcoal);
+  color: rgba(255, 255, 255, .8);
   font-weight: 300;
   font-style: italic
 }
 
 .mission-text strong {
   font-weight: 600;
-  color: var(--deep);
+  color: #e8dff0;
   font-style: normal
 }
 

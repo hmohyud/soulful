@@ -14,12 +14,18 @@
     if (lp >= 100) { clearInterval(li); setTimeout(() => loader.classList.add('done'), 300); }
   }, 120);
 
-  /* ─── CUSTOM CURSOR ─── */
+  /* ─── CUSTOM CURSOR (hero only) ─── */
   const dot = document.getElementById('cursorDot'), ring = document.getElementById('cursorRing');
   if (dot && ring && matchMedia('(pointer:fine)').matches && !('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
-    let mx = 0, my = 0, rx = 0, ry = 0;
+    let mx = 0, my = 0, rx = 0, ry = 0, inHero = false;
+    const heroEl = document.getElementById('hero');
+    dot.style.opacity = '0'; ring.style.opacity = '0';
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = (mx-4)+'px'; dot.style.top = (my-4)+'px'; });
     (function cl() { rx+=(mx-rx)*.1; ry+=(my-ry)*.1; ring.style.left=(rx-22)+'px'; ring.style.top=(ry-22)+'px'; requestAnimationFrame(cl); })();
+    if (heroEl) {
+      heroEl.addEventListener('mouseenter', () => { inHero = true; dot.style.opacity = '1'; ring.style.opacity = '1'; });
+      heroEl.addEventListener('mouseleave', () => { inHero = false; dot.style.opacity = '0'; ring.style.opacity = '0'; });
+    }
     const sel = 'a,button,.faq-q,.gallery-item,.benefit-card,.workshop-pill,.credential,.btt,.paint-color,.paint-clear,.tcard,.copy-btn,.tl-item,.pw-node,.pw-pointer';
     document.addEventListener('mouseover', e => { if(e.target.closest(sel)){dot.classList.add('hovering');ring.classList.add('hovering');} });
     document.addEventListener('mouseout', e => { if(e.target.closest(sel)){dot.classList.remove('hovering');ring.classList.remove('hovering');} });
@@ -407,154 +413,123 @@
 
 
   /* ═══════════════════════════════════════════════════════════════
-     ★ WATERCOLOR — Ink drops on hover + splatter on click (Mission)
+     ★ GRAVITY WELLS — Orbiting particles with mouse attractor (Mission)
      ═══════════════════════════════════════════════════════════════ */
   (() => {
     const canvas = document.getElementById('bloomCanvas');
     if (!canvas) return;
     const bc = canvas.getContext('2d');
-    let W, H, vis = false, tick = 0;
-    const MAX_DROPS = 25, MAX_SPLATS = 6;
-    const PAL = [
-      {r:107,g:63,b:160},  {r:160,g:51,b:77},
-      {r:155,g:122,b:158}, {r:212,g:160,b:160}, {r:163,g:196,b:160}
+    let W, H, vis = false;
+    const COUNT = 900;
+    const WELL_COUNT = 4;
+    const MOUSE_RADIUS = 160;
+
+    const COLORS = [
+      [170, 120, 255],  // bright purple
+      [220, 100, 140],  // rose-pink
+      [200, 170, 220],  // plum-light
+      [240, 190, 190],  // warm rose
+      [180, 220, 170],  // sage-light
+      [210, 180, 240],  // lavender
     ];
-    function rgba(c,a){return 'rgba('+c.r+','+c.g+','+c.b+','+a+')';}
-    function pick(){return PAL[Math.floor(Math.random()*PAL.length)];}
 
-    function rz(){
-      const r=canvas.parentElement.getBoundingClientRect(), d=devicePixelRatio||1;
-      canvas.width=r.width*d; canvas.height=r.height*d;
-      W=r.width; H=r.height; bc.setTransform(d,0,0,d,0,0);
-    }
-    rz(); addEventListener('resize',rz);
-    new IntersectionObserver(e=>{vis=e[0].isIntersecting;},{threshold:0.05}).observe(canvas);
+    let particles = [];
+    let wells = [];
+    let mouse = { x: -9999, y: -9999 };
 
-    /* — shared organic blob path — */
-    function blobPath(cx,cy,r,offsets){
-      const n=offsets.length;
-      bc.beginPath();
-      for(let j=0;j<=n;j++){
-        const a=(j/n)*Math.PI*2;
-        const off=offsets[j%n];
-        const px=cx+Math.cos(a)*r*off, py=cy+Math.sin(a)*r*off;
-        if(j===0){bc.moveTo(px,py);}
-        else{
-          const pa=((j-0.5)/n)*Math.PI*2;
-          const co=(offsets[j%n]+offsets[(j-1+n)%n])*0.5;
-          bc.quadraticCurveTo(cx+Math.cos(pa)*r*co, cy+Math.sin(pa)*r*co, px, py);
-        }
-      }
-      bc.closePath();
-    }
-
-    /* — ink drops (hover) — */
-    const drops=[];
-    let lastX=-1, lastY=-1;
-    const DROP_FADE=0.006; // ~2.5s fade
-
-    const mEl=document.getElementById('mission');
-    mEl.addEventListener('mousemove',e=>{
-      const r=mEl.getBoundingClientRect();
-      const x=e.clientX-r.left, y=e.clientY-r.top;
-      const dx=x-lastX, dy=y-lastY;
-      if(Math.sqrt(dx*dx+dy*dy)>50||lastX<0){
-        if(drops.length>=MAX_DROPS) drops.shift();
-        drops.push({x,y,c:pick(),maxR:30+Math.random()*50,life:1,
-          speed:0.3+Math.random()*0.3,
-          offsets:Array.from({length:6},()=>0.7+Math.random()*0.6)});
-        lastX=x; lastY=y;
-      }
-    });
-    mEl.addEventListener('mouseleave',()=>{lastX=-1;lastY=-1;});
-
-    /* — splatters (click) — ~6s fade — */
-    const splatters=[];
-    const SPLAT_FADE=1/(6*30); // ~6s at 30fps (we skip frames)
-
-    canvas.addEventListener('click',e=>{
-      const r=canvas.getBoundingClientRect();
-      const x=e.clientX-r.left, y=e.clientY-r.top;
-      const c=pick();
-      const blobs=[];
-      // central blob
-      blobs.push({x,y,r:30+Math.random()*35,
-        offsets:Array.from({length:6},()=>0.6+Math.random()*0.8),drip:null});
-      // satellite droplets — fewer for perf
-      const count=5+Math.floor(Math.random()*5);
-      for(let i=0;i<count;i++){
-        const a=Math.random()*Math.PI*2, dist=35+Math.random()*90;
-        blobs.push({
-          x:x+Math.cos(a)*dist, y:y+Math.sin(a)*dist,
-          r:5+Math.random()*14,
-          offsets:Array.from({length:5},()=>0.6+Math.random()*0.8),
-          drip:Math.random()>0.5?{len:12+Math.random()*35,
-            angle:Math.PI/2+Math.random()*0.4-0.2}:null
-        });
-      }
-      if(splatters.length>=MAX_SPLATS) splatters.shift();
-      splatters.push({blobs,color:c,life:1});
+    const initWell = () => ({
+      x: Math.random() * (W || 800),
+      y: Math.random() * (H || 400),
+      vx: (Math.random() - 0.5) * 0.2,
+      vy: (Math.random() - 0.5) * 0.2,
+      mass: 30 + Math.random() * 40,
     });
 
-    /* — draw loop (throttled to ~30fps) — */
-    function draw(){
-      requestAnimationFrame(draw);
-      if(!vis) return;
-      if(++tick%2) return; // skip every other frame → 30fps
-      bc.clearRect(0,0,W,H);
+    const initParticle = () => {
+      const c = COLORS[Math.floor(Math.random() * COLORS.length)];
+      return {
+        x: Math.random() * (W || 800),
+        y: Math.random() * (H || 400),
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        size: 0.6 + Math.random() * 1.8,
+        r: c[0], g: c[1], b: c[2],
+        alpha: 0.15 + Math.random() * 0.4,
+      };
+    };
 
-      /* draw ink drops — single fill pass, no blur filter */
-      for(let i=drops.length-1;i>=0;i--){
-        const d=drops[i];
-        d.life-=DROP_FADE*d.speed;
-        if(d.life<=0){drops.splice(i,1);continue;}
-        const expand=1+(1-d.life)*1.2;
-        const cr=d.maxR*expand;
+    function rz() {
+      const r = canvas.parentElement.getBoundingClientRect(), d = devicePixelRatio || 1;
+      canvas.width = r.width * d; canvas.height = r.height * d;
+      W = r.width; H = r.height; bc.setTransform(d, 0, 0, d, 0, 0);
+      particles = [];
+      wells = [];
+      for (let i = 0; i < COUNT; i++) particles.push(initParticle());
+      for (let i = 0; i < WELL_COUNT; i++) wells.push(initWell());
+    }
+    rz(); addEventListener('resize', rz);
+    new IntersectionObserver(e => { vis = e[0].isIntersecting; }, { threshold: 0.05 }).observe(canvas);
 
-        bc.save();
-        bc.globalAlpha=d.life*0.35;
-        blobPath(d.x,d.y,cr,d.offsets);
-        bc.fillStyle=rgba(d.c,0.7);
-        bc.fill();
-        // lighter halo — just a bigger fill, no blur filter
-        bc.globalAlpha=d.life*0.15;
-        blobPath(d.x,d.y,cr*1.4,d.offsets);
-        bc.fillStyle=rgba(d.c,0.3);
-        bc.fill();
-        bc.restore();
+    const mEl = document.getElementById('mission');
+    mEl.addEventListener('mousemove', e => {
+      const r = mEl.getBoundingClientRect();
+      mouse.x = e.clientX - r.left;
+      mouse.y = e.clientY - r.top;
+    });
+    mEl.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+
+    let raf;
+    function draw() {
+      raf = requestAnimationFrame(draw);
+      if (!vis) return;
+      bc.clearRect(0, 0, W, H);
+
+      // Drift wells
+      for (const w of wells) {
+        w.x += w.vx;
+        w.y += w.vy;
+        if (w.x < 0 || w.x > W) w.vx *= -1;
+        if (w.y < 0 || w.y > H) w.vy *= -1;
+        w.x = Math.max(0, Math.min(W, w.x));
+        w.y = Math.max(0, Math.min(H, w.y));
       }
 
-      /* draw splatters — single pass, no blur filter */
-      for(let i=splatters.length-1;i>=0;i--){
-        const s=splatters[i];
-        s.life-=SPLAT_FADE;
-        if(s.life<=0){splatters.splice(i,1);continue;}
-
-        bc.save();
-        for(const b of s.blobs){
-          bc.globalAlpha=s.life*0.5;
-          blobPath(b.x,b.y,b.r,b.offsets);
-          bc.fillStyle=rgba(s.color,0.7);
-          bc.fill();
-          // halo
-          bc.globalAlpha=s.life*0.2;
-          blobPath(b.x,b.y,b.r*1.3,b.offsets);
-          bc.fillStyle=rgba(s.color,0.3);
-          bc.fill();
-          // drip
-          if(b.drip){
-            const ex=b.x+Math.cos(b.drip.angle)*b.drip.len;
-            const ey=b.y+Math.sin(b.drip.angle)*b.drip.len;
-            bc.beginPath();
-            bc.moveTo(b.x-3,b.y);
-            bc.quadraticCurveTo(b.x,b.y+b.drip.len*0.5,ex,ey);
-            bc.quadraticCurveTo(b.x,b.y+b.drip.len*0.5,b.x+3,b.y);
-            bc.fillStyle=rgba(s.color,0.5);
-            bc.globalAlpha=s.life*0.35;
-            bc.fill();
-          }
+      for (const p of particles) {
+        // Gravity from wells
+        for (const w of wells) {
+          const dx = w.x - p.x;
+          const dy = w.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) + 40;
+          const f = w.mass / (dist * dist) * 0.6;
+          p.vx += (dx / dist) * f;
+          p.vy += (dy / dist) * f;
         }
-        bc.restore();
+
+        // Mouse attractor
+        const mdx = mouse.x - p.x;
+        const mdy = mouse.y - p.y;
+        const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (mdist < MOUSE_RADIUS && mdist > 5) {
+          const mf = (1 - mdist / MOUSE_RADIUS) * 1.2;
+          p.vx += (mdx / mdist) * mf;
+          p.vy += (mdy / mdist) * mf;
+        }
+
+        p.vx *= 0.965;
+        p.vy *= 0.965;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Wrap within section bounds
+        if (p.x < -15) p.x = W + 15;
+        if (p.x > W + 15) p.x = -15;
+        if (p.y < -15) p.y = H + 15;
+        if (p.y > H + 15) p.y = -15;
+
+        bc.beginPath();
+        bc.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        bc.fillStyle = `rgba(${p.r},${p.g},${p.b},${p.alpha})`;
+        bc.fill();
       }
     }
     draw();
