@@ -14,22 +14,6 @@
     if (lp >= 100) { clearInterval(li); setTimeout(() => loader.classList.add('done'), 300); }
   }, 120);
 
-  /* ─── CUSTOM CURSOR (hero only) ─── */
-  const dot = document.getElementById('cursorDot'), ring = document.getElementById('cursorRing');
-  if (dot && ring && matchMedia('(pointer:fine)').matches && !('ontouchstart' in window) && navigator.maxTouchPoints === 0) {
-    let mx = 0, my = 0, rx = 0, ry = 0, inHero = false;
-    const heroEl = document.getElementById('hero');
-    dot.style.opacity = '0'; ring.style.opacity = '0';
-    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = (mx-4)+'px'; dot.style.top = (my-4)+'px'; });
-    (function cl() { rx+=(mx-rx)*.1; ry+=(my-ry)*.1; ring.style.left=(rx-22)+'px'; ring.style.top=(ry-22)+'px'; requestAnimationFrame(cl); })();
-    if (heroEl) {
-      heroEl.addEventListener('mouseenter', () => { inHero = true; dot.style.opacity = '1'; ring.style.opacity = '1'; });
-      heroEl.addEventListener('mouseleave', () => { inHero = false; dot.style.opacity = '0'; ring.style.opacity = '0'; });
-    }
-    const sel = 'a,button,.faq-q,.gallery-item,.benefit-card,.workshop-pill,.credential,.btt,.paint-color,.paint-clear,.tcard,.copy-btn,.tl-item,.pw-node,.pw-pointer';
-    document.addEventListener('mouseover', e => { if(e.target.closest(sel)){dot.classList.add('hovering');ring.classList.add('hovering');} });
-    document.addEventListener('mouseout', e => { if(e.target.closest(sel)){dot.classList.remove('hovering');ring.classList.remove('hovering');} });
-  }
 
   /* ─── BG CANVAS (organic watercolor blobs) ─── */
   const bgC = document.getElementById('bgCanvas');

@@ -172,42 +172,6 @@ button {
   }
 }
 
-/* ─── CURSOR (desktop) ─── */
-.cursor-dot {
-  position: fixed;
-  width: 8px;
-  height: 8px;
-  background: var(--terra);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99999;
-  mix-blend-mode: difference;
-  transition: width .25s var(--ease), height .25s var(--ease), background .25s, opacity .3s ease
-}
-
-.cursor-ring {
-  position: fixed;
-  width: 44px;
-  height: 44px;
-  border: 1.5px solid var(--terra);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 99999;
-  mix-blend-mode: difference;
-  transition: width .4s var(--ease), height .4s var(--ease), border-color .3s, opacity .3s ease
-}
-
-.cursor-dot.hovering {
-  width: 16px;
-  height: 16px;
-  background: var(--sage)
-}
-
-.cursor-ring.hovering {
-  width: 60px;
-  height: 60px;
-  border-color: var(--sage)
-}
 
 /* ─── ANIMATED BG CANVAS ─── */
 #bgCanvas {
@@ -4151,19 +4115,6 @@ button {
     height: 16px
   }
 
-  .cursor-dot,
-  .cursor-ring {
-    display: none !important
-  }
-}
-
-/* Hide custom cursor on any touch-primary device (tablets, phones in landscape, etc.) */
-@media(pointer:coarse) {
-
-  .cursor-dot,
-  .cursor-ring {
-    display: none !important
-  }
 }
 
 @media(max-width:480px) {
